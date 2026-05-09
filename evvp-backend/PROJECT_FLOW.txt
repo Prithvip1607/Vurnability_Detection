@@ -1,0 +1,481 @@
+================================================================================
+  EVVP — EARLY VULNERABILITY VERIFICATION PLATFORM
+  PROJECT FLOW, ARCHITECTURE & PHASE ROADMAP
+  Last updated: 2025
+================================================================================
+
+--------------------------------------------------------------------------------
+  WHAT THIS PROJECT IS
+--------------------------------------------------------------------------------
+
+EVVP is a real-time vulnerability intelligence system inspired by CVEPulse /
+CVETrends. It continuously monitors the internet for emerging vulnerability
+discussions — on Reddit, GitHub, security blogs, and the NVD feed — extracts
+CVE IDs and zero-day signals, scores them, deduplicates them, tracks how many
+times each CVE is being mentioned across sources, and fires notifications when
+something new or trending is detected.
+
+Goal of Phase 1 (current):
+  - Automated, continuous ingestion from 4 source types
+  - Signal scoring to filter noise
+  - CVE trending detection (like CVEPulse)
+  - Notifications: console + Slack/Discord webhook + email
+  - Full audit trail of every system action
+  - REST API for a future frontend
+
+--------------------------------------------------------------------------------
+  REPOSITORY STRUCTURE
+--------------------------------------------------------------------------------
+
+evvp-backend/                   ← standalone Python backend service
+│
+├── main.py                     ← entry point (CLI)
+├── requirements.txt
+├── .env.example                ← all configurable variables documented
+├── .gitignore
+│
+├── config/
+│   └── settings.py             ← all config loaded from .env
+│
+├── ingestion/                  ← data collectors (one file per source)
+│   ├── reddit.py               ← Reddit public JSON + RSS fallback
+│   ├── github.py               ← GitHub repos, issues, commits, org issues
+│   ├── blog.py                 ← 18 RSS/Atom security feeds
+│   └── nvd.py                  ← NVD REST API v2.0 (recent CVEs)
+│
+├── pipeline/                   ← processing stages (called by all collectors)
+│   ├── processor.py            ← orchestrator: runs item through all stages
+│   ├── signal_filter.py        ← scoring engine: 70+ positive, 50+ negative terms
+│   ├── nvd_enricher.py         ← attaches CVSS data for CVE IDs found in item
+│   ├── novelty.py              ← deduplication: ID / URL / CVE / title similarity
+│   ├── tracker.py              ← CVE mention counter + spike/trending detection
+│   └── notifier.py             ← dispatches alerts (console, webhook, email)
+│
+├── storage/
+│   └── db.py                   ← PostgreSQL (primary) + JSONL fallback, thread-safe
+│
+├── scheduler/
+│   └── runner.py               ← starts all 4 workers as daemon threads
+│
+├── api/
+│   └── server.py               ← Flask REST API (no HTML, JSON only)
+│
+├── utils/
+│   ├── logger.py               ← rotating file + console logger
+│   ├── audit.py                ← structured audit trail (JSONL + human log)
+│   ├── retry.py                ← exponential backoff decorator
+│   └── rate_limiter.py         ← token bucket (used by GitHub collector)
+│
+├── logs/                       ← auto-created
+│   ├── audit.jsonl             ← machine-readable audit trail (one JSON per line)
+│   ├── audit.log               ← human-readable audit log (rotating)
+│   ├── pipeline.log
+│   ├── ingestion.reddit.log
+│   ├── ingestion.github.log
+│   ├── ingestion.blog.log
+│   ├── ingestion.nvd.log
+│   ├── notifier.log
+│   ├── tracker.log
+│   └── storage.log
+│
+└── raw_data/                   ← auto-created, JSONL storage
+    ├── reddit/YYYY-MM-DD.jsonl
+    ├── github/YYYY-MM-DD.jsonl
+    ├── blog/YYYY-MM-DD.jsonl
+    ├── nvd/YYYY-MM-DD.jsonl
+    └── cve_mentions.jsonl      ← persisted CVE mention counts (tracker)
+
+evvp-frontend/                  ← placeholder (Phase 2)
+    └── README.md
+
+--------------------------------------------------------------------------------
+  FULL DATA FLOW (step by step)
+--------------------------------------------------------------------------------
+
+STEP 1 — INGESTION
+  Every collector runs on its own daemon thread (scheduler/runner.py).
+  Each polls its source on a configurable interval:
+    Reddit  → 300s  (5 min)
+    GitHub  → 600s  (10 min)
+    Blog    → 900s  (15 min)
+    NVD     → 3600s (1 hour)
+
+  Reddit:
+    - Fetches /r/{subreddit}/new.json for 12 subreddits
+    - Falls back to RSS if JSON fails
+    - Builds a normalized item dict
+
+  GitHub:
+    - Searches repos, issues, commits for 25 exploit/vuln keywords
+    - Monitors googleprojectzero, projectdiscovery, cisagov org issues
+    - Token bucket rate limiter (200 req/hr default)
+
+  Blog/RSS:
+    - Fetches 18 security feeds (BleepingComputer, THN, Krebs, ZDI, etc.)
+    - Parses Atom/RSS with feedparser
+    - Extracts full content or summary
+
+  NVD:
+    - Calls NVD REST API v2.0 for CVEs published in last 3 days
+    - Extracts CVSS v3/v2 scores, description, references
+
+  Every item is normalized to this schema:
+    {
+      id, platform, source, title, text, author,
+      timestamp, url, metadata
+    }
+
+STEP 2 — SIGNAL SCORING  (pipeline/signal_filter.py)
+  Every item is scored:
+    positive_score = sum of matched exploit/vuln terms (70+ terms, weighted 4-10)
+    CVE bonus      = +4 per CVE ID found, capped at +12
+    negative_score = sum of matched noise terms (50+ terms, doubled if in title)
+    net_score      = max(positive - negative, 0)
+
+  Category assigned:
+    high_confidence_vulnerability_signal  → net >= 14 + exploit keywords
+    exploit_development_discussion        → net >= 6  + exploit-dev keywords
+    educational_tutorial_content          → noise dominated
+    general_cybersecurity_discussion      → everything else
+
+  Gate: item PASSES only if:
+    net_score >= 8  AND  category in (high_confidence, exploit_dev)
+
+  AUDIT: item_collected → item_passed OR item_dropped
+
+STEP 3 — NVD ENRICHMENT  (pipeline/nvd_enricher.py)
+  If the item contains CVE IDs (e.g. CVE-2024-1234):
+    - Calls NVD REST API for each CVE (up to 5 per item)
+    - Attaches CVSS v3 score, severity, description, references
+    - Results stored in item["nvd_data"]
+    - In-process cache prevents duplicate NVD lookups
+
+  AUDIT: nvd_enriched (with cve_ids and count)
+
+STEP 4 — NOVELTY CHECK  (pipeline/novelty.py)
+  Checks if this item is truly new vs already stored:
+    1. Exact ID match         → duplicate
+    2. URL match              → duplicate
+    3. CVE ID overlap         → duplicate (same CVE already stored)
+    4. Title similarity >= 85% → duplicate (Jaccard token overlap)
+
+  Looks back 30 days (configurable: NOVELTY_LOOKBACK_DAYS).
+  Novel items get is_novel=True in the verified record.
+
+  AUDIT: item_novel OR item_duplicate (with reason)
+
+STEP 5 — STORAGE  (storage/db.py)
+  Two tables / two backends:
+
+  intel_raw:
+    - Every item that passes signal scoring is stored here
+    - Includes signal_score, category, matched_signals, negative_signals
+    - ON CONFLICT (id) DO NOTHING — idempotent
+
+  intel_verified:
+    - One record per raw item
+    - Adds: is_novel, novelty_reason, severity_estimate, nvd_data
+    - Updated if item is re-processed
+
+  PostgreSQL: ThreadedConnectionPool (min=1, max=10) — thread-safe
+  JSONL fallback: per-file threading.Lock + in-memory seen-ID set
+
+  AUDIT: storage_saved OR storage_fail
+
+STEP 6 — CVE TREND TRACKING  (pipeline/tracker.py)
+  Every CVE ID found in a passing item is recorded with:
+    { ts, platform, url, title }
+
+  Spike detection (runs after every mention recorded):
+    - Count mentions of this CVE in last SPIKE_WINDOW_HOURS (default: 6h)
+    - If count >= SPIKE_THRESHOLD (default: 3) → TRENDING
+    - Cooldown: don't re-alert same CVE within TREND_COOLDOWN_MINS (default: 60min)
+
+  On trending: fires all registered callbacks → notifier.dispatch_trending()
+  Persisted to: raw_data/cve_mentions.jsonl (survives restarts)
+  Loaded on startup: main.py → _bootstrap() → tracker.load_from_disk()
+
+  AUDIT: trending_detected (with cve_id, mentions, sources, window_hours)
+
+STEP 7 — NOTIFICATION  (pipeline/notifier.py)
+  Fires for:
+    a) Novel high-signal items (new_vulnerability or zero_day_detected)
+    b) Trending CVE events (trending_cve)
+
+  Filter: only notify if signal_score >= NOTIFY_MIN_SCORE (default: 14)
+           AND severity in NOTIFY_SEVERITY_FILTER (default: CRITICAL, HIGH)
+           Trending CVEs always notify regardless of filter.
+
+  Channels (all run in background threads):
+    Console log  — always on, emoji-coded by severity
+    Webhook      — Slack / Discord (set WEBHOOK_URL in .env)
+    Email (SMTP) — set SMTP_HOST + ALERT_EMAIL_TO in .env
+
+  AUDIT: notification_sent OR notification_fail (per channel)
+
+STEP 8 — AUDIT LOG  (utils/audit.py)
+  Every significant action writes to:
+    logs/audit.jsonl  — one JSON object per line, machine-readable
+    logs/audit.log    — human-readable rotating log (10MB, 5 backups)
+
+  In-memory counters (exposed via API):
+    items_collected, items_passed, items_dropped,
+    notifications, trending_alerts, errors
+
+  Events logged:
+    system_start / system_stop
+    worker_start / worker_error
+    item_collected / item_passed / item_dropped / item_duplicate / item_novel
+    nvd_enriched / nvd_fetch_fail
+    trending_detected
+    notification_sent / notification_fail
+    storage_saved / storage_fail
+    error
+
+STEP 9 — REST API  (api/server.py)
+  Runs on port 8000 (configurable).
+  60-second TTL in-memory cache on all read endpoints.
+  All responses paginated with { items, total, page, per_page, pages }.
+
+  Endpoints:
+    GET /api/health                         system health check
+    GET /api/stats                          totals, platform counts, 7-day timeline
+    GET /api/trending?hours=24&top=20       CVEs trending by mention count
+    GET /api/trending/<CVE-ID>              all mentions for one CVE
+    GET /api/feed/<platform>?page=1         reddit / github / blog / nvd / all
+    GET /api/zerodays?days=7&min_score=8    pre-CVE zero-day candidates
+    GET /api/cves?days=7&min_score=6        CVE-tagged high-signal items
+    GET /api/search?q=<query>               full-text search
+    GET /api/item/<id>                      single item detail
+    GET /api/audit?n=100                    last N audit entries
+    GET /api/audit/stats                    aggregate counters
+
+--------------------------------------------------------------------------------
+  AUDIT LOG FORMAT
+--------------------------------------------------------------------------------
+
+Every line in logs/audit.jsonl looks like:
+
+  {"ts":"2025-01-15T10:23:45+00:00","event":"item_passed","platform":"reddit",
+   "title":"PAN-OS Zero-Day RCE actively exploited","score":31,
+   "category":"high_confidence_vulnerability_signal","matched":["zero-day","rce","actively exploited"]}
+
+  {"ts":"2025-01-15T10:23:46+00:00","event":"nvd_enriched","platform":"reddit",
+   "cve_ids":["CVE-2025-0282"],"nvd_count":1}
+
+  {"ts":"2025-01-15T10:23:46+00:00","event":"item_novel","platform":"reddit",
+   "title":"PAN-OS Zero-Day RCE actively exploited","cve_id":"CVE-2025-0282",
+   "score":31,"severity":"CRITICAL"}
+
+  {"ts":"2025-01-15T10:23:46+00:00","event":"notification_sent","channel":"webhook",
+   "cve_id":"CVE-2025-0282","event_type":"new_vulnerability"}
+
+  {"ts":"2025-01-15T10:25:00+00:00","event":"trending_detected","cve_id":"CVE-2025-0282",
+   "mentions":4,"sources":["reddit","blog","github"],"window_hours":6}
+
+--------------------------------------------------------------------------------
+  HOW TO RUN
+--------------------------------------------------------------------------------
+
+  # Install dependencies
+  pip install -r requirements.txt
+
+  # Configure credentials
+  cp .env.example .env
+  # Edit .env — add GITHUB_TOKEN, WEBHOOK_URL, etc.
+
+  # Run everything (all 4 collectors + API on :8000)
+  python main.py
+
+  # Run ingestion only (no API)
+  python main.py --ingest-only
+
+  # Run API only (serve already-collected data)
+  python main.py --api-only
+
+  # Single pass (test / cron)
+  python main.py --once
+  python main.py --once --collector reddit
+
+  # Single collector continuously
+  python main.py --collector github
+
+  # Check audit log
+  tail -f logs/audit.log
+  cat logs/audit.jsonl | python3 -m json.tool | less
+
+  # Check API
+  curl http://localhost:8000/api/health
+  curl http://localhost:8000/api/trending
+  curl http://localhost:8000/api/audit/stats
+
+--------------------------------------------------------------------------------
+  PHASE 1 — CURRENT (COMPLETE)
+--------------------------------------------------------------------------------
+
+  [x] Reddit ingestion (12 subreddits, JSON + RSS fallback)
+  [x] GitHub ingestion (repos, issues, commits, org issues)
+  [x] Blog/RSS ingestion (18 security feeds)
+  [x] NVD ingestion (recent CVEs via REST API v2.0)
+  [x] Signal scoring engine (70+ positive, 50+ negative terms, 4 categories)
+  [x] NVD enrichment (CVSS v3/v2 attached to CVE items)
+  [x] Novelty check (ID / URL / CVE / title similarity deduplication)
+  [x] Thread-safe storage (PostgreSQL pool + JSONL fallback with per-file locks)
+  [x] CVE trend tracker (mention counting + spike detection)
+  [x] Notification system (console + Slack/Discord webhook + SMTP email)
+  [x] Structured audit log (JSONL + rotating human log)
+  [x] REST API (10 endpoints, TTL cache, pagination)
+  [x] Graceful shutdown (SIGINT/SIGTERM handled)
+  [x] Exponential backoff retry on all network calls
+  [x] Token bucket rate limiter (GitHub)
+
+--------------------------------------------------------------------------------
+  PHASE 2 — NEXT (FRONTEND)
+--------------------------------------------------------------------------------
+
+  Goal: Build a CVEPulse-style web dashboard that consumes the Phase 1 API.
+
+  Stack: React + TypeScript + Tailwind CSS + Recharts
+
+  Pages / Views:
+    [ ] Trending CVEs page
+          - Bar chart: top 20 CVEs by mention count (last 24h / 7d toggle)
+          - Per-CVE row: CVE ID, mention count, sources (badges), CVSS score,
+            latest mention title + link
+          - Auto-refreshes every 60s
+
+    [ ] Zero-Days page
+          - Items with NO CVE ID, high signal score
+          - Sorted by score, shows matched signals, platform badge
+          - "New" badge for items < 24h old
+
+    [ ] CVEs page
+          - CVE-tagged items actively discussed
+          - CVE ID chips, CVSS severity badge, source platform
+
+    [ ] Feed page (per platform tabs: Reddit / GitHub / Blog / NVD)
+          - Infinite scroll or pagination
+          - Signal score badge, category badge, matched signals
+
+    [ ] Search
+          - Full-text search across all collected intel
+
+    [ ] Audit Log page
+          - Live tail of audit.jsonl events
+          - Filter by event type
+          - Counters: collected / passed / dropped / notifications / errors
+
+  API endpoints it will use:
+    GET /api/trending
+    GET /api/trending/<CVE-ID>
+    GET /api/zerodays
+    GET /api/cves
+    GET /api/feed/<platform>
+    GET /api/search
+    GET /api/stats
+    GET /api/audit
+    GET /api/audit/stats
+
+--------------------------------------------------------------------------------
+  PHASE 3 — VERIFICATION ENGINE
+--------------------------------------------------------------------------------
+
+  Goal: After collection + trending detection, automatically verify whether
+  a detected vulnerability is real, novel, and exploitable.
+
+  Components to build:
+    [ ] CVE cross-reference
+          - Check NVD, MITRE, OSV.dev for the CVE ID
+          - If not in NVD yet → candidate for pre-disclosure tracking
+
+    [ ] PoC validator
+          - If a GitHub repo is linked, check:
+              - Does it have actual exploit code? (file extensions, keywords)
+              - Stars / forks / age (credibility signals)
+              - Is it a fork of a known PoC framework?
+
+    [ ] Affected product extractor
+          - Extract vendor + product + version from title/text using regex + NLP
+          - Map to CPE (Common Platform Enumeration) if possible
+
+    [ ] Credibility scorer
+          - Source reputation (googleprojectzero > random reddit post)
+          - Author history (first post vs established researcher)
+          - Cross-source confirmation (same vuln seen on 3+ sources = more credible)
+
+    [ ] Verification result schema:
+          {
+            raw_id, cve_id, is_novel, is_confirmed_exploitable,
+            affected_products, credibility_score, verification_notes,
+            verified_at
+          }
+
+    [ ] New DB table: intel_verification_results
+
+--------------------------------------------------------------------------------
+  PHASE 4 — ADDITIONAL SOURCES
+--------------------------------------------------------------------------------
+
+  [ ] Twitter/X — search for CVE IDs and exploit keywords via API v2
+  [ ] Mastodon  — infosec.exchange and similar instances
+  [ ] Telegram  — public security channels (via MTProto API)
+  [ ] Discord   — public security servers (via bot)
+  [ ] Exploit-DB RSS — https://www.exploit-db.com/rss.xml
+  [ ] HackerOne public disclosures — https://hackerone.com/hacktivity
+  [ ] CISA KEV (Known Exploited Vulnerabilities) — https://www.cisa.gov/known-exploited-vulnerabilities-catalog
+  [ ] OSV.dev   — open source vulnerability database
+  [ ] Packet Storm Security RSS
+  [ ] VulnDB / Vulners API
+
+--------------------------------------------------------------------------------
+  PHASE 5 — PRODUCTION HARDENING
+--------------------------------------------------------------------------------
+
+  [ ] Docker + docker-compose (backend + postgres + redis)
+  [ ] Redis for caching instead of in-memory TTL dict
+  [ ] Celery for task queue (replace threading with proper workers)
+  [ ] Prometheus metrics endpoint (/metrics)
+  [ ] Grafana dashboard for system health
+  [ ] Rate limit the REST API (per-IP)
+  [ ] API key authentication for the REST API
+  [ ] HTTPS / TLS termination (nginx reverse proxy)
+  [ ] Kubernetes deployment manifests (Helm chart)
+  [ ] CI/CD pipeline (GitHub Actions)
+  [ ] Automated tests (pytest — unit + integration)
+  [ ] Sentry error tracking
+
+--------------------------------------------------------------------------------
+  CONFIGURATION REFERENCE (.env)
+--------------------------------------------------------------------------------
+
+  REDDIT_CLIENT_ID          Reddit app client ID (optional)
+  REDDIT_CLIENT_SECRET      Reddit app secret (optional)
+  GITHUB_TOKEN              GitHub personal access token (recommended)
+  NVD_API_KEY               NVD API key (optional, removes rate limits)
+  DB_URL                    PostgreSQL DSN (optional, uses JSONL if empty)
+
+  REDDIT_POLL_INTERVAL      seconds between Reddit polls (default: 300)
+  GITHUB_POLL_INTERVAL      seconds between GitHub polls (default: 600)
+  BLOG_POLL_INTERVAL        seconds between blog polls (default: 900)
+  NVD_POLL_INTERVAL         seconds between NVD polls (default: 3600)
+
+  WEBHOOK_URL               Slack or Discord incoming webhook URL
+  ALERT_EMAIL_TO            recipient email for alerts
+  ALERT_EMAIL_FROM          sender email
+  SMTP_HOST                 SMTP server hostname
+  SMTP_PORT                 SMTP port (default: 587)
+  SMTP_USER                 SMTP username
+  SMTP_PASS                 SMTP password / app password
+
+  NOTIFY_MIN_SCORE          minimum signal score to trigger notification (default: 14)
+  NOTIFY_SEVERITY_FILTER    comma-separated severities to notify (default: CRITICAL,HIGH)
+
+  SPIKE_WINDOW_HOURS        CVE trending detection window in hours (default: 6)
+  SPIKE_THRESHOLD           mentions in window to trigger trending alert (default: 3)
+  TREND_COOLDOWN_MINS       minutes before re-alerting same CVE (default: 60)
+
+  NOVELTY_LOOKBACK_DAYS     days to look back for duplicate detection (default: 30)
+
+================================================================================
+  END OF DOCUMENT
+================================================================================

@@ -66,22 +66,32 @@ def _zero_day_score(item: dict) -> int:
 # ── Core loader ───────────────────────────────────────────────────────────────
 
 def _load_all(days: int) -> list[dict]:
-    items = []
-    for platform in ["reddit", "github", "blog"]:
+    items: list[dict] = []
+    seen_ids: set[str] = set()
+    for platform in ("reddit", "github", "blog"):
         platform_dir = os.path.join(RAW_DATA_DIR, platform)
-        if not os.path.exists(platform_dir):
+        if not os.path.isdir(platform_dir):
             continue
-        for filename in os.listdir(platform_dir):
+        for filename in sorted(os.listdir(platform_dir), reverse=True):
             if not filename.endswith(".jsonl"):
                 continue
             try:
-                with open(os.path.join(platform_dir, filename), "r", encoding="utf-8") as f:
+                with open(os.path.join(platform_dir, filename), encoding="utf-8") as f:
                     for line in f:
-                        if line.strip():
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
                             item = json.loads(line)
-                            if _is_recent(item, days):
-                                items.append(item)
-            except Exception as e:
+                        except json.JSONDecodeError:
+                            continue
+                        uid = item.get("id") or item.get("url", "")
+                        if uid in seen_ids:
+                            continue
+                        seen_ids.add(uid)
+                        if _is_recent(item, days):
+                            items.append(item)
+            except OSError as e:
                 print(f"Error reading {filename}: {e}")
     return items
 
@@ -90,10 +100,10 @@ def _dedupe(items: list[dict]) -> list[dict]:
     seen: set[str] = set()
     out = []
     for item in items:
-        url = item.get("url", "")
-        if url and url in seen:
+        key = item.get("id") or item.get("url", "")
+        if key and key in seen:
             continue
-        seen.add(url)
+        seen.add(key)
         out.append(item)
     return out
 
