@@ -9,6 +9,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 from pipeline.tracker import get_trending, get_all_mentions
 from storage.db import load_recent_raw, load_verifications
@@ -16,6 +17,7 @@ from utils.audit  import get_recent as audit_recent, get_stats as audit_stats
 from utils.logger import get_logger
 
 app    = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 logger = get_logger("api")
 
 _CVE_RE = re.compile(r"CVE-\d{4}-\d+", re.IGNORECASE)

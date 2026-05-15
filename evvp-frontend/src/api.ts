@@ -19,6 +19,7 @@ export interface IntelItem {
   cve_ids?: string[]
   nvd_data?: NVDRecord[]
   metadata?: Record<string, unknown>
+  sources?: { url: string; platform: string }[]
 }
 
 export interface NVDRecord {

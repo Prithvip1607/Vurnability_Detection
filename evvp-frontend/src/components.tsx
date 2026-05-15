@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { IntelItem } from './api'
 
 export function severityFromScore(score: number): string {
@@ -81,89 +82,131 @@ export function Pagination({ page, pages, total, onPage }: {
   )
 }
 
-// The main vulnerability card — full description, date, source link, signals
+// Compact post row — click to open detail drawer
 export function VulnCard({ item }: { item: IntelItem }) {
-  const cves = item.cve_ids || []
-  const hasCve = cves.length > 0
+  const [open, setOpen] = useState(false)
   const severity = severityFromScore(item.signal_score)
-  const nvd = item.nvd_data?.[0]
-  const publishedDate = formatDate(item.timestamp || item.collected_at)
-  const collectedDate = formatDate(item.collected_at)
-  const desc = item.text?.trim()
+  const cves = item.cve_ids || []
 
-  // Card left-border class
-  let cardClass = 'vuln-card'
-  if (hasCve) cardClass += ' has-cve'
-  else if (severity === 'CRITICAL') cardClass += ' is-critical'
-  else if (severity === 'HIGH') cardClass += ' is-high'
+  let rowClass = 'post-row'
+  if (cves.length > 0) rowClass += ' has-cve'
+  else if (severity === 'CRITICAL') rowClass += ' is-critical'
+  else if (severity === 'HIGH') rowClass += ' is-high'
 
   return (
-    <div className={cardClass}>
-      {/* Header: score + title */}
-      <div className="vuln-header">
+    <>
+      <div className={rowClass} onClick={() => setOpen(true)}>
         <ScoreBadge score={item.signal_score} />
-        <div style={{ flex: 1 }}>
-          <div className="vuln-title">
-            <a href={item.url} target="_blank" rel="noopener noreferrer">
-              {item.title}
-            </a>
+        <div className="post-row-title">{item.title}</div>
+        <div className="post-row-meta">
+          <PlatformBadge platform={item.platform} />
+          <SeverityBadge severity={severity} />
+          {cves.length > 0 && <span className="badge badge-info">CVE</span>}
+          {isNew(item.collected_at) && <span className="badge badge-new">NEW</span>}
+          {item.sources && item.sources.length > 1 && (
+            <span className="badge badge-info" style={{ background: 'rgba(6,182,212,0.1)', color: 'var(--cyan)', borderColor: 'rgba(6,182,212,0.25)' }}>
+              {item.sources.length} sources
+            </span>
+          )}
+          <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 4 }}>{timeAgo(item.collected_at)}</span>
+        </div>
+      </div>
+
+      {open && <PostDetail item={item} onClose={() => setOpen(false)} />}
+    </>
+  )
+}
+
+// Full detail drawer/modal
+function PostDetail({ item, onClose }: { item: IntelItem; onClose: () => void }) {
+  const cves = item.cve_ids || []
+  const severity = severityFromScore(item.signal_score)
+  const nvd = item.nvd_data?.[0]
+  const desc = nvd?.description || item.text?.trim()
+  const sources = item.sources && item.sources.length > 0 ? item.sources : [{ url: item.url, platform: item.platform }]
+
+  return (
+    <div className="drawer-overlay" onClick={onClose}>
+      <div className="drawer" onClick={e => e.stopPropagation()}>
+        <div className="drawer-header">
+          <div style={{ flex: 1 }}>
+            <div className="drawer-title">{item.title}</div>
+            <div className="vuln-meta" style={{ marginTop: 8, marginBottom: 0 }}>
+              <PlatformBadge platform={item.platform} />
+              <SeverityBadge severity={severity} />
+              {cves.length > 0 && <span className="badge badge-info">CVE</span>}
+              <span className="vuln-meta-sep">|</span>
+              <span style={{ fontSize: 12, color: 'var(--text3)' }}>📅 {formatDate(item.timestamp || item.collected_at)}</span>
+              {item.author && <><span className="vuln-meta-sep">|</span><span style={{ fontSize: 12, color: 'var(--text3)' }}>👤 {item.author}</span></>}
+            </div>
+          </div>
+          <button className="drawer-close" onClick={onClose}>✕</button>
+        </div>
+
+        {/* CVSS */}
+        {nvd?.cvss_v3 && (
+          <div className="drawer-section" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 11, color: 'var(--text3)' }}>CVSS v3</span>
+            <span className="cvss-score" style={{ color: cvssColor(nvd.cvss_v3.score) }}>{nvd.cvss_v3.score}</span>
+            <SeverityBadge severity={nvd.cvss_v3.severity} />
+            <span style={{ fontSize: 11, color: 'var(--text3)', fontFamily: 'var(--mono)' }}>{nvd.cvss_v3.vector}</span>
+          </div>
+        )}
+
+        {/* Description */}
+        {desc && (
+          <div className="drawer-section">
+            <div className="drawer-label">Description</div>
+            <div className="drawer-desc">{desc}</div>
+          </div>
+        )}
+
+        {/* CVE tags */}
+        {cves.length > 0 && (
+          <div className="drawer-section">
+            <div className="drawer-label">CVE IDs</div>
+            <div className="vuln-tags" style={{ marginTop: 6 }}>
+              {cves.map(c => <span key={c} className="cve-tag">{c.toUpperCase()}</span>)}
+            </div>
+          </div>
+        )}
+
+        {/* Matched signals */}
+        {item.matched_signals?.length > 0 && (
+          <div className="drawer-section">
+            <div className="drawer-label">Matched Signals</div>
+            <div className="vuln-tags" style={{ marginTop: 6 }}>
+              {item.matched_signals.map(s => <span key={s} className="signal-tag">{s}</span>)}
+            </div>
+          </div>
+        )}
+
+        {/* Sources */}
+        <div className="drawer-section">
+          <div className="drawer-label">Sources ({sources.length})</div>
+          <div className="drawer-sources">
+            {sources.map((s, i) => (
+              <a
+                key={i}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="drawer-source-item"
+              >
+                <span className={`badge badge-${s.platform}`} style={{ marginRight: 8 }}>{s.platform}</span>
+                <span className="drawer-source-url">{s.url}</span>
+                <span style={{ marginLeft: 'auto', color: 'var(--accent)', fontSize: 13 }}>↗</span>
+              </a>
+            ))}
           </div>
         </div>
-        {isNew(item.collected_at) && <span className="badge badge-new">NEW</span>}
-      </div>
 
-      {/* Meta row */}
-      <div className="vuln-meta">
-        <PlatformBadge platform={item.platform} />
-        <SeverityBadge severity={severity} />
-        {hasCve && <span className="badge badge-info">CVE</span>}
-        <span className="vuln-meta-sep">|</span>
-        <span>📅 Published: <strong style={{ color: 'var(--text)' }}>{publishedDate}</strong></span>
-        <span className="vuln-meta-sep">|</span>
-        <span>🕐 Collected: {collectedDate}</span>
-        <span className="vuln-meta-sep">|</span>
-        <span>📌 {item.source}</span>
-        {item.author && <><span className="vuln-meta-sep">|</span><span>👤 {item.author}</span></>}
-      </div>
-
-      {/* NVD CVSS if available */}
-      {nvd?.cvss_v3 && (
-        <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 11, color: 'var(--text3)' }}>CVSS v3</span>
-          <span className="cvss-score" style={{ color: cvssColor(nvd.cvss_v3.score) }}>
-            {nvd.cvss_v3.score}
-          </span>
-          <SeverityBadge severity={nvd.cvss_v3.severity} />
-          <span style={{ fontSize: 11, color: 'var(--text3)', fontFamily: 'var(--mono)' }}>
-            {nvd.cvss_v3.vector}
+        <div className="drawer-footer">
+          <span style={{ fontSize: 12, color: 'var(--text3)' }}>
+            Signal score: <span style={{ color: scoreColor(item.signal_score), fontFamily: 'var(--mono)', fontWeight: 700 }}>{item.signal_score}</span>
+            &nbsp;·&nbsp; {item.category?.replace(/_/g, ' ')}
           </span>
         </div>
-      )}
-
-      {/* Description */}
-      {desc && (
-        <div className="vuln-desc">
-          {nvd?.description || desc}
-        </div>
-      )}
-
-      {/* CVE tags + signal tags */}
-      {(cves.length > 0 || item.matched_signals?.length > 0) && (
-        <div className="vuln-tags">
-          {cves.map(c => <span key={c} className="cve-tag">{c.toUpperCase()}</span>)}
-          {item.matched_signals?.slice(0, 8).map(s => <span key={s} className="signal-tag">{s}</span>)}
-        </div>
-      )}
-
-      {/* Footer: source link */}
-      <div className="vuln-footer">
-        <div style={{ fontSize: 12, color: 'var(--text3)' }}>
-          Signal score: <span style={{ color: scoreColor(item.signal_score), fontFamily: 'var(--mono)', fontWeight: 700 }}>{item.signal_score}</span>
-          &nbsp;·&nbsp; {item.category?.replace(/_/g, ' ')}
-        </div>
-        <a href={item.url} target="_blank" rel="noopener noreferrer" className="vuln-link">
-          View Source ↗
-        </a>
       </div>
     </div>
   )

@@ -19,7 +19,7 @@ from pipeline.novelty        import check as novelty_check
 from pipeline.tracker        import record as track_cves
 from pipeline.notifier       import dispatch
 from pipeline.verifier       import verify
-from storage.db              import save_raw, save_verified, save_verification, load_recent_raw
+from storage.db              import save_raw, save_verified, save_verification, load_recent_raw, append_source
 from utils.audit             import audit, EV_ITEM_COLLECTED, EV_ITEM_PASSED, EV_ITEM_DROPPED, \
                                      EV_ITEM_DUPLICATE, EV_ITEM_NOVEL, EV_NVD_ENRICHED, \
                                      EV_STORAGE_SAVED, EV_NOTIFICATION_SENT
@@ -83,11 +83,19 @@ def process(item: dict) -> bool:
         audit(EV_ITEM_DUPLICATE,
               platform=platform, title=title,
               reason=novelty.reason, duplicate_of=novelty.duplicate_id)
+        # Append this source URL to the existing item instead of storing a duplicate
+        if novelty.duplicate_id and item.get("url"):
+            append_source(novelty.duplicate_id, item["url"], platform)
+            logger.info("[%s] duplicate — appended source to %s | %.80s",
+                        platform.upper(), novelty.duplicate_id, title)
+        return False
 
     # 4. Persist raw item
     if not item.get("id"):
         item["id"] = str(uuid.uuid4())
     item["collected_at"] = datetime.now(timezone.utc).isoformat()
+    # Initialise sources list with the originating URL
+    item.setdefault("sources", [{"url": item.get("url", ""), "platform": platform}])
     save_raw(item)
     audit(EV_STORAGE_SAVED, platform=platform, item_id=item["id"])
 

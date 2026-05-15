@@ -54,8 +54,10 @@ CREATE TABLE IF NOT EXISTS intel_raw (
     category          TEXT,
     matched_signals   JSONB DEFAULT '[]',
     negative_signals  JSONB DEFAULT '[]',
-    collected_at      TIMESTAMPTZ DEFAULT NOW()
+    collected_at      TIMESTAMPTZ DEFAULT NOW(),
+    sources           JSONB DEFAULT '[]'
 );
+ALTER TABLE intel_raw ADD COLUMN IF NOT EXISTS sources JSONB DEFAULT '[]';
 CREATE INDEX IF NOT EXISTS idx_intel_platform    ON intel_raw(platform);
 CREATE INDEX IF NOT EXISTS idx_intel_score       ON intel_raw(signal_score DESC);
 CREATE INDEX IF NOT EXISTS idx_intel_collected   ON intel_raw(collected_at DESC);
@@ -147,6 +149,14 @@ def load_recent_raw(days: int = 7) -> list[dict]:
     return _json_load_recent(days)
 
 
+def append_source(existing_id: str, new_url: str, new_platform: str) -> None:
+    """Add a new source URL+platform to an existing item without creating a duplicate."""
+    if _use_postgres():
+        _pg_append_source(existing_id, new_url, new_platform)
+    else:
+        _json_append_source(existing_id, new_url, new_platform)
+
+
 def save_verification(record: dict[str, Any]) -> None:
     """Persist a Phase 3 verification result."""
     if not record.get("id"):
@@ -167,6 +177,31 @@ def load_verifications(days: int = 7) -> list[dict]:
 
 # ── PostgreSQL helpers ────────────────────────────────────────────────────────
 
+def _pg_append_source(existing_id: str, new_url: str, new_platform: str) -> None:
+    try:
+        pool = _get_pool()
+        conn = pool.getconn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    UPDATE intel_raw
+                    SET sources = (
+                        SELECT jsonb_agg(DISTINCT elem)
+                        FROM jsonb_array_elements(
+                            COALESCE(sources, '[]'::jsonb) || %s::jsonb
+                        ) elem
+                    )
+                    WHERE id = %s
+                """, (
+                    json.dumps([{"url": new_url, "platform": new_platform}]),
+                    existing_id,
+                ))
+            conn.commit()
+        finally:
+            pool.putconn(conn)
+    except Exception as e:
+        logger.error("PG append_source failed (%s): %s", existing_id, e)
+
 def _pg_save_raw(item: dict[str, Any]) -> None:
     try:
         pool = _get_pool()
@@ -176,8 +211,8 @@ def _pg_save_raw(item: dict[str, Any]) -> None:
                 cur.execute("""
                     INSERT INTO intel_raw
                         (id, platform, source, title, body, author, source_ts, url,
-                         metadata, signal_score, category, matched_signals, negative_signals)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                         metadata, signal_score, category, matched_signals, negative_signals, sources)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                     ON CONFLICT (id) DO NOTHING
                 """, (
                     item.get("id"), item.get("platform"), item.get("source"),
@@ -187,6 +222,7 @@ def _pg_save_raw(item: dict[str, Any]) -> None:
                     item.get("signal_score", 0), item.get("category", ""),
                     psycopg2.extras.Json(item.get("matched_signals", [])),
                     psycopg2.extras.Json(item.get("negative_signals", [])),
+                    psycopg2.extras.Json(item.get("sources", [])),
                 ))
             conn.commit()
         finally:
@@ -290,6 +326,48 @@ def _json_save(item: dict[str, Any]) -> None:
         with open(path, "a", encoding="utf-8") as f:
             f.write(json.dumps(item, ensure_ascii=False, default=str) + "\n")
     logger.debug("JSON saved: %s", item_id)
+
+
+def _json_append_source(existing_id: str, new_url: str, new_platform: str) -> None:
+    """Rewrite the JSONL file updating the matching item's sources list."""
+    from datetime import timedelta
+    for platform in ("reddit", "github", "blog", "nvd"):
+        d = os.path.join(RAW_DATA_DIR, platform)
+        if not os.path.isdir(d):
+            continue
+        for fn in sorted(os.listdir(d), reverse=True):
+            if not fn.endswith(".jsonl"):
+                continue
+            path = os.path.join(d, fn)
+            lock = _get_file_lock(path)
+            with lock:
+                lines = []
+                found = False
+                try:
+                    with open(path, encoding="utf-8") as f:
+                        for line in f:
+                            line = line.strip()
+                            if not line:
+                                continue
+                            try:
+                                obj = json.loads(line)
+                                if obj.get("id") == existing_id:
+                                    sources = obj.get("sources", [])
+                                    entry = {"url": new_url, "platform": new_platform}
+                                    if entry not in sources:
+                                        sources.append(entry)
+                                    obj["sources"] = sources
+                                    found = True
+                                lines.append(json.dumps(obj, ensure_ascii=False, default=str))
+                            except json.JSONDecodeError:
+                                pass
+                except OSError:
+                    continue
+                if found:
+                    with open(path, "w", encoding="utf-8") as f:
+                        f.write("\n".join(lines) + "\n")
+                    logger.debug("JSON append_source: %s <- %s", existing_id, new_url)
+                    return
 
 
 def _json_load_recent(days: int) -> list[dict]:
