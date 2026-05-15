@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zero-Day Vulnerability Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0f172a; color: #e2e8f0; }
+    .card { background: #1e293b; border: 1px solid #334155; }
+    .badge-high { background: #7f1d1d; color: #fca5a5; }
+    .badge-medium { background: #78350f; color: #fcd34d; }
+    .badge-low { background: #14532d; color: #86efac; }
+    .badge-unknown { background: #1e3a5f; color: #93c5fd; }
+    tr:hover td { background: #1e3a5f22; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen p-6">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-red-400">🛡️ Zero-Day Vulnerability Dashboard</h1>
+    <p class="text-slate-400 mt-1">Real-time tracking of zero-day vulnerabilities from Reddit, GitHub & Security Blogs</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="stats-cards">
+    <div class="card rounded-xl p-4 text-center">
+      <div class="text-3xl font-bold text-white" id="stat-total">—</div>
+      <div class="text-slate-400 text-sm mt-1">Total Entries</div>
+    </div>
+    <div class="card rounded-xl p-4 text-center">
+      <div class="text-3xl font-bold text-red-400" id="stat-zerodays">—</div>
+      <div class="text-slate-400 text-sm mt-1">Zero-Days Found</div>
+    </div>
+    <div class="card rounded-xl p-4 text-center">
+      <div class="text-3xl font-bold text-orange-400" id="stat-high">—</div>
+      <div class="text-slate-400 text-sm mt-1">HIGH Severity</div>
+    </div>
+    <div class="card rounded-xl p-4 text-center">
+      <div class="text-3xl font-bold text-green-400" id="stat-targets">—</div>
+      <div class="text-slate-400 text-sm mt-1">Targets Identified</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card rounded-xl p-4 mb-6 flex flex-wrap gap-4 items-center">
+    <input
+      id="search"
+      type="text"
+      placeholder="🔍 Search vulnerabilities..."
+      class="bg-slate-700 text-white rounded-lg px-4 py-2 flex-1 min-w-[200px] outline-none border border-slate-600 focus:border-red-400"
+      oninput="filterTable()"
+    />
+    <select id="filter-severity" class="bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 outline-none" onchange="filterTable()">
+      <option value="">All Severity</option>
+      <option value="HIGH">HIGH</option>
+      <option value="MEDIUM">MEDIUM</option>
+      <option value="LOW">LOW</option>
+    </select>
+    <select id="filter-target" class="bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 outline-none" onchange="filterTable()">
+      <option value="">All Targets</option>
+    </select>
+    <select id="filter-type" class="bg-slate-700 text-white rounded-lg px-4 py-2 border border-slate-600 outline-none" onchange="filterTable()">
+      <option value="">All Vuln Types</option>
+    </select>
+    <button onclick="resetFilters()" class="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg text-sm">Reset</button>
+  </div>
+
+  <!-- Table -->
+  <div class="card rounded-xl overflow-hidden">
+    <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+      <h2 class="text-lg font-semibold text-red-400">Zero-Day Vulnerability List</h2>
+      <span id="result-count" class="text-slate-400 text-sm"></span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-slate-400 border-b border-slate-700 text-left">
+            <th class="px-4 py-3 w-8">#</th>
+            <th class="px-4 py-3">Description</th>
+            <th class="px-4 py-3 w-24">Severity</th>
+            <th class="px-4 py-3 w-32">Target</th>
+            <th class="px-4 py-3 w-36">Vuln Type</th>
+            <th class="px-4 py-3 w-20">Exploit</th>
+            <th class="px-4 py-3 w-20">Source</th>
+          </tr>
+        </thead>
+        <tbody id="vuln-table">
+          <tr><td colspan="7" class="text-center py-10 text-slate-500">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let allData = [];
+
+    async function loadStats() {
+      const res = await fetch('/api/stats');
+      const stats = await res.json();
+      document.getElementById('stat-total').textContent = stats.total;
+      document.getElementById('stat-zerodays').textContent = stats.zero_days;
+      document.getElementById('stat-high').textContent = stats.severity.HIGH || 0;
+      document.getElementById('stat-targets').textContent = Object.keys(stats.targets).length;
+
+      // Populate target filter
+      const targetSel = document.getElementById('filter-target');
+      Object.keys(stats.targets).sort().forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t; opt.textContent = t;
+        targetSel.appendChild(opt);
+      });
+
+      // Populate vuln type filter
+      const typeSel = document.getElementById('filter-type');
+      Object.keys(stats.vulnerability_types).sort().forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t; opt.textContent = t;
+        typeSel.appendChild(opt);
+      });
+    }
+
+    async function loadData() {
+      const res = await fetch('/api/zero-days');
+      allData = await res.json();
+      renderTable(allData);
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('vuln-table');
+      document.getElementById('result-count').textContent = `${data.length} results`;
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-10 text-slate-500">No results found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map((d, i) => {
+        const severity = d.label || 'LOW';
+        const badgeClass = severity === 'HIGH' ? 'badge-high' : severity === 'MEDIUM' ? 'badge-medium' : 'badge-low';
+        const target = d.target_software || '—';
+        const vulnType = d.vulnerability_type || '—';
+        const hasExploit = d.has_exploit ? '<span class="text-red-400 font-bold">YES</span>' : '<span class="text-slate-500">No</span>';
+        const source = d.source || '—';
+        const text = d.text ? d.text.substring(0, 120) + (d.text.length > 120 ? '...' : '') : '—';
+
+        return `
+          <tr class="border-b border-slate-800 cursor-pointer" onclick="showDetail(${i})">
+            <td class="px-4 py-3 text-slate-500">${i + 1}</td>
+            <td class="px-4 py-3 text-slate-300">${text}</td>
+            <td class="px-4 py-3"><span class="px-2 py-1 rounded text-xs font-bold ${badgeClass}">${severity}</span></td>
+            <td class="px-4 py-3 text-blue-400">${target}</td>
+            <td class="px-4 py-3 text-purple-400">${vulnType}</td>
+            <td class="px-4 py-3">${hasExploit}</td>
+            <td class="px-4 py-3 text-slate-400">${source}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    function filterTable() {
+      const search = document.getElementById('search').value.toLowerCase();
+      const severity = document.getElementById('filter-severity').value;
+      const target = document.getElementById('filter-target').value;
+      const type = document.getElementById('filter-type').value;
+
+      const filtered = allData.filter(d => {
+        const text = (d.text || '').toLowerCase();
+        const matchSearch = !search || text.includes(search);
+        const matchSeverity = !severity || d.label === severity;
+        const matchTarget = !target || (d.target_software || 'Unknown') === target;
+        const matchType = !type || (d.vulnerability_type || 'Unknown') === type;
+        return matchSearch && matchSeverity && matchTarget && matchType;
+      });
+
+      renderTable(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('search').value = '';
+      document.getElementById('filter-severity').value = '';
+      document.getElementById('filter-target').value = '';
+      document.getElementById('filter-type').value = '';
+      renderTable(allData);
+    }
+
+    // Detail modal
+    function showDetail(index) {
+      const d = allData[index];
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4';
+      modal.innerHTML = `
+        <div class="card rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+          <div class="flex justify-between items-start mb-4">
+            <h3 class="text-lg font-bold text-red-400">Vulnerability Detail</h3>
+            <button onclick="this.closest('.fixed').remove()" class="text-slate-400 hover:text-white text-xl">✕</button>
+          </div>
+          <div class="space-y-3 text-sm">
+            <div><span class="text-slate-400">Severity:</span> <span class="font-bold ${d.label === 'HIGH' ? 'text-red-400' : d.label === 'MEDIUM' ? 'text-yellow-400' : 'text-green-400'}">${d.label}</span></div>
+            <div><span class="text-slate-400">Target:</span> <span class="text-blue-400">${d.target_software || 'Unknown'}</span></div>
+            <div><span class="text-slate-400">Vuln Type:</span> <span class="text-purple-400">${d.vulnerability_type || 'Unknown'}</span></div>
+            <div><span class="text-slate-400">Attack Type:</span> <span class="text-orange-400">${d.attack_type || 'Unknown'}</span></div>
+            <div><span class="text-slate-400">Has Exploit:</span> <span class="${d.has_exploit ? 'text-red-400 font-bold' : 'text-slate-500'}">${d.has_exploit ? 'YES - Working exploit exists' : 'No'}</span></div>
+            <div><span class="text-slate-400">Source:</span> <span class="text-slate-300">${d.source}</span></div>
+            <div class="mt-4 p-3 bg-slate-800 rounded-lg">
+              <div class="text-slate-400 mb-2">Full Description:</div>
+              <div class="text-slate-300 leading-relaxed">${d.text}</div>
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    }
+
+    loadStats();
+    loadData();
+  </script>
+</body>
+</html>
