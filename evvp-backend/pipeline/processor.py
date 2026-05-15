@@ -18,7 +18,8 @@ from pipeline.nvd_enricher  import enrich
 from pipeline.novelty        import check as novelty_check
 from pipeline.tracker        import record as track_cves
 from pipeline.notifier       import dispatch
-from storage.db              import save_raw, save_verified, load_recent_raw
+from pipeline.verifier       import verify
+from storage.db              import save_raw, save_verified, save_verification, load_recent_raw
 from utils.audit             import audit, EV_ITEM_COLLECTED, EV_ITEM_PASSED, EV_ITEM_DROPPED, \
                                      EV_ITEM_DUPLICATE, EV_ITEM_NOVEL, EV_NVD_ENRICHED, \
                                      EV_STORAGE_SAVED, EV_NOTIFICATION_SENT
@@ -107,6 +108,19 @@ def process(item: dict) -> bool:
             "matched_signals": item["matched_signals"],
         },
     })
+
+    # 5b. Phase 3 — Verification Engine (runs on novel items only)
+    if novelty.is_novel:
+        try:
+            vr = verify(item, cross_source_count=1)
+            vr["id"] = str(uuid.uuid4())
+            save_verification(vr)
+            item["verification"] = vr
+            logger.info("[VERIFY] status=%s cred=%d poc=%s | %.60s",
+                        vr["verification_status"], vr["credibility_score"],
+                        vr["poc_found"], title)
+        except Exception as e:
+            logger.error("Verifier failed for %s: %s", item.get("id"), e)
 
     # 6. CVE trend tracking
     cve_ids = item.get("cve_ids") or list(set(_CVE_RE.findall(

@@ -73,6 +73,24 @@ CREATE TABLE IF NOT EXISTS intel_verified (
 );
 CREATE INDEX IF NOT EXISTS idx_verified_novel    ON intel_verified(is_novel);
 CREATE INDEX IF NOT EXISTS idx_verified_ts       ON intel_verified(verified_at DESC);
+
+CREATE TABLE IF NOT EXISTS intel_verification_results (
+    id                   TEXT PRIMARY KEY,
+    raw_id               TEXT,
+    poc_found            BOOLEAN DEFAULT FALSE,
+    poc_signals          JSONB DEFAULT '[]',
+    affected_products    JSONB DEFAULT '[]',
+    credibility_score    INTEGER DEFAULT 0,
+    credibility_notes    JSONB DEFAULT '[]',
+    in_nvd               BOOLEAN DEFAULT FALSE,
+    in_nvd_at            TEXT,
+    cross_source_count   INTEGER DEFAULT 1,
+    verification_status  TEXT DEFAULT 'unverified',
+    verified_at          TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_vr_raw_id ON intel_verification_results(raw_id);
+CREATE INDEX IF NOT EXISTS idx_vr_status ON intel_verification_results(verification_status);
+CREATE INDEX IF NOT EXISTS idx_vr_cred   ON intel_verification_results(credibility_score DESC);
 """
 
 
@@ -127,6 +145,24 @@ def load_recent_raw(days: int = 7) -> list[dict]:
     if _use_postgres():
         return _pg_load_recent(days)
     return _json_load_recent(days)
+
+
+def save_verification(record: dict[str, Any]) -> None:
+    """Persist a Phase 3 verification result."""
+    if not record.get("id"):
+        import uuid
+        record["id"] = str(uuid.uuid4())
+    if _use_postgres():
+        _pg_save_verification(record)
+    else:
+        _json_save_verification(record)
+
+
+def load_verifications(days: int = 7) -> list[dict]:
+    """Load recent verification results."""
+    if _use_postgres():
+        return _pg_load_verifications(days)
+    return _json_load_verifications(days)
 
 
 # ── PostgreSQL helpers ────────────────────────────────────────────────────────
@@ -293,3 +329,95 @@ def _json_load_recent(days: int) -> list[dict]:
             except OSError:
                 pass
     return items
+
+
+def _pg_save_verification(record: dict[str, Any]) -> None:
+    try:
+        pool = _get_pool()
+        conn = pool.getconn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO intel_verification_results
+                        (id, raw_id, poc_found, poc_signals, affected_products,
+                         credibility_score, credibility_notes, in_nvd, in_nvd_at,
+                         cross_source_count, verification_status)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    ON CONFLICT (id) DO UPDATE SET
+                        credibility_score=EXCLUDED.credibility_score,
+                        verification_status=EXCLUDED.verification_status,
+                        verified_at=NOW()
+                """, (
+                    record.get("id"), record.get("raw_id"),
+                    record.get("poc_found", False),
+                    psycopg2.extras.Json(record.get("poc_signals", [])),
+                    psycopg2.extras.Json(record.get("affected_products", [])),
+                    record.get("credibility_score", 0),
+                    psycopg2.extras.Json(record.get("credibility_notes", [])),
+                    record.get("in_nvd", False),
+                    record.get("in_nvd_at", ""),
+                    record.get("cross_source_count", 1),
+                    record.get("verification_status", "unverified"),
+                ))
+            conn.commit()
+        finally:
+            pool.putconn(conn)
+    except Exception as e:
+        logger.error("PG save_verification failed: %s", e)
+        _json_save_verification(record)
+
+
+def _pg_load_verifications(days: int) -> list[dict]:
+    try:
+        pool = _get_pool()
+        conn = pool.getconn()
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute("""
+                    SELECT * FROM intel_verification_results
+                    WHERE verified_at >= NOW() - INTERVAL '%s days'
+                    ORDER BY credibility_score DESC, verified_at DESC
+                """, (days,))
+                return [dict(r) for r in cur.fetchall()]
+        finally:
+            pool.putconn(conn)
+    except Exception as e:
+        logger.error("PG load_verifications failed: %s", e)
+        return _json_load_verifications(days)
+
+
+_VR_PATH = os.path.join(RAW_DATA_DIR, "verifications.jsonl")
+_vr_lock = threading.Lock()
+
+
+def _json_save_verification(record: dict[str, Any]) -> None:
+    os.makedirs(RAW_DATA_DIR, exist_ok=True)
+    with _vr_lock:
+        with open(_VR_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+
+
+def _json_load_verifications(days: int) -> list[dict]:
+    from datetime import timedelta
+    cutoff = datetime.now() - timedelta(days=days)
+    results: list[dict] = []
+    if not os.path.exists(_VR_PATH):
+        return results
+    try:
+        with open(_VR_PATH, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                    ts_str = rec.get("verified_at", "")
+                    dt = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                    if dt.replace(tzinfo=None) > cutoff:
+                        results.append(rec)
+                except Exception:
+                    pass
+    except OSError:
+        pass
+    results.sort(key=lambda x: x.get("credibility_score", 0), reverse=True)
+    return results

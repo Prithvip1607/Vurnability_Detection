@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from flask import Flask, jsonify, request
 
 from pipeline.tracker import get_trending, get_all_mentions
-from storage.db import load_recent_raw
+from storage.db import load_recent_raw, load_verifications
 from utils.audit  import get_recent as audit_recent, get_stats as audit_stats
 from utils.logger import get_logger
 
@@ -205,6 +205,33 @@ def item_detail(item_id: str):
     for item in _get_items(days=30):
         if item.get("id") == item_id:
             return jsonify(item)
+    return jsonify({"error": "not found"}), 404
+
+
+@app.route("/api/verified")
+def verified():
+    """Phase 3 verification results — confirmed/likely/unverified items."""
+    days      = request.args.get("days", 7, type=int)
+    status    = request.args.get("status", "")   # confirmed | likely | unverified
+    page      = max(1, request.args.get("page", 1, type=int))
+    per_page  = request.args.get("per_page", 50, type=int)
+
+    def _build():
+        results = load_verifications(days=days)
+        if status:
+            results = [r for r in results if r.get("verification_status") == status]
+        return results
+
+    return jsonify(_paginate(_cached(f"verified_{days}_{status}", _build), page, per_page))
+
+
+@app.route("/api/verified/<raw_id>")
+def verified_detail(raw_id: str):
+    """Verification record for a specific raw item."""
+    results = load_verifications(days=30)
+    for r in results:
+        if r.get("raw_id") == raw_id:
+            return jsonify(r)
     return jsonify({"error": "not found"}), 404
 
 

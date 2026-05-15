@@ -1,0 +1,251 @@
+================================================================================
+  EVVP — SESSION WORK LOG
+  Date: 2025-05-11
+  What was built, what changed, how things work, where we are
+================================================================================
+
+--------------------------------------------------------------------------------
+  WHAT WAS DONE TODAY
+--------------------------------------------------------------------------------
+
+1. PHASE 3 — VERIFICATION ENGINE (pipeline/verifier.py)  [NEW]
+   ─────────────────────────────────────────────────────
+   Built the full Phase 3 verification engine. Every novel item that passes
+   the pipeline now gets automatically verified. The verifier runs 4 checks:
+
+   a) PoC Validator
+      - Extracts GitHub repo URLs from item text/URL
+      - Calls GitHub API to inspect the repo:
+          · Checks file tree for exploit file extensions (.py, .c, .cpp, .sh, etc.)
+          · Checks filenames for exploit keywords (exploit, poc, payload, shellcode)
+          · Checks repo description for PoC keywords
+          · Records star count as credibility signal
+      - Falls back to text-based keyword matching if no GitHub URL
+
+   b) Affected Product Extractor
+      - 20 regex patterns extract vendor/product/version from title + text
+      - Covers: Windows, Linux kernel, Apache, nginx, OpenSSL, Chrome, Firefox,
+        VMware, Cisco, Palo Alto, Fortinet, Ivanti, Confluence, Exchange,
+        SharePoint, Spring, Log4j, Kubernetes, Docker
+      - Returns up to 10 distinct product strings
+
+   c) Credibility Scorer (0-100)
+      - Source reputation table: googleprojectzero=40, portswigger=30,
+        unit42=25, microsoft=22, krebsonsecurity=20, r/netsec=18, etc.
+      - Signal score contribution: score * 2, capped at 30
+      - PoC found: +25
+      - Cross-source confirmation: 3+ sources = +20, 2 sources = +10
+      - NVD data attached: +15
+      - CVE IDs present: +10
+
+   d) Verification Status
+      - confirmed  : credibility >= 70 AND (poc_found OR in_nvd)
+      - likely     : credibility >= 45 OR (poc_found AND signal >= 14)
+      - unverified : signal >= 8
+      - noise      : everything else
+
+   Output schema per item:
+   {
+     raw_id, poc_found, poc_signals, affected_products,
+     credibility_score, credibility_notes, in_nvd, in_nvd_at,
+     cross_source_count, verification_status, verified_at
+   }
+
+2. STORAGE — intel_verification_results TABLE  (storage/db.py)
+   ─────────────────────────────────────────────────────────────
+   Added third DB table: intel_verification_results
+   - Columns: id, raw_id, poc_found, poc_signals, affected_products,
+              credibility_score, credibility_notes, in_nvd, in_nvd_at,
+              cross_source_count, verification_status, verified_at
+   - Indexes: raw_id, verification_status, credibility_score DESC
+   - New public functions: save_verification(), load_verifications()
+   - JSONL fallback: raw_data/verifications.jsonl
+
+3. PIPELINE — processor.py wired to verifier
+   ─────────────────────────────────────────
+   After novelty check, if item is novel:
+     → verifier.verify(item) runs
+     → result saved via save_verification()
+     → result attached to item as item["verification"]
+   Errors in verifier are caught and logged — never block the pipeline.
+
+4. API — 2 new endpoints  (api/server.py)
+   ───────────────────────────────────────
+   GET /api/verified?days=7&status=confirmed&page=1
+     - Returns paginated verification results
+     - Filter by status: confirmed | likely | unverified | noise
+     - Sorted by credibility_score DESC
+
+   GET /api/verified/<raw_id>
+     - Returns verification record for a specific raw item
+
+5. FRONTEND — Fixed connection + Phase 3 UI
+   ─────────────────────────────────────────
+   a) Fixed vite.config.ts
+      - Port changed to 5173 (was 3000)
+      - Proxy /api → http://localhost:8000 (changeOrigin: true)
+      - This means frontend and backend are now properly connected
+        via Vite dev proxy — no CORS issues
+
+   b) Fixed api.ts
+      - baseURL changed from 'http://localhost:8000/api' to '/api'
+      - All API calls now go through Vite proxy
+
+   c) New page: Verified (src/pages/Verified.tsx)
+      - 4 stat cards: Confirmed / Likely / Unverified / Noise (clickable filters)
+      - Per-result card shows:
+          · Status badge with color coding
+          · Credibility score with animated progress bar
+          · PoC Found / In NVD / Cross-Source count
+          · Affected products (red tags)
+          · PoC signals (blue tags)
+          · Full credibility reasoning notes
+      - Filter by status + days
+      - Auto-refreshes every 60s
+
+   d) Updated App.tsx routing — added /verified route
+   e) Updated Layout.tsx sidebar — added 🔬 Verified under INTELLIGENCE section
+
+--------------------------------------------------------------------------------
+  CURRENT PROJECT STATE — WHAT IS COMPLETE
+--------------------------------------------------------------------------------
+
+PHASE 1 — INGESTION + PIPELINE  ✅ COMPLETE
+  ✅ Reddit ingestion (12 subreddits, JSON + RSS fallback)
+  ✅ GitHub ingestion (repos, issues, commits, org issues — 25 keywords)
+  ✅ Blog/RSS ingestion (18 security feeds)
+  ✅ NVD ingestion (REST API v2.0, recent CVEs)
+  ✅ Signal scoring (70+ positive, 50+ negative terms, 4 categories)
+  ✅ NVD enrichment (CVSS v3/v2 attached)
+  ✅ Novelty check (ID / URL / CVE / title similarity)
+  ✅ Thread-safe storage (PostgreSQL pool + JSONL fallback)
+  ✅ CVE trend tracker (mention counting + spike detection)
+  ✅ Notification system (console + Slack/Discord + SMTP)
+  ✅ Structured audit log (JSONL + rotating human log)
+  ✅ REST API (12 endpoints, TTL cache, pagination)
+  ✅ Graceful shutdown, retry decorator, rate limiter
+
+PHASE 2 — FRONTEND  ✅ COMPLETE
+  ✅ React + TypeScript + Vite + Recharts
+  ✅ Vite proxy connected to backend (:8000)
+  ✅ Dashboard — pipeline counters, timeline chart, trending CVEs, source status
+  ✅ All Findings — every fetched item, full description, date, source link
+  ✅ Zero-Days — pre-CVE candidates
+  ✅ CVEs — CVE-tagged discussions
+  ✅ Trending — CVEs ranked by mention count
+  ✅ Verified — Phase 3 verification results
+  ✅ Per-source feeds (Reddit / GitHub / Blog / NVD)
+  ✅ Search — full-text across all intel
+  ✅ Audit Log — pipeline counters + log commands
+
+PHASE 3 — VERIFICATION ENGINE  ✅ COMPLETE
+  ✅ PoC validator (GitHub repo inspection + text-based)
+  ✅ Affected product extractor (20 regex patterns)
+  ✅ Credibility scorer (0-100, source reputation + signals)
+  ✅ Verification status (confirmed / likely / unverified / noise)
+  ✅ intel_verification_results DB table + JSONL fallback
+  ✅ Wired into processor.py (runs on every novel item)
+  ✅ API endpoints: /api/verified, /api/verified/<raw_id>
+  ✅ Frontend Verified page with full UI
+
+PHASE 4 — ADDITIONAL SOURCES  ❌ NOT STARTED
+  [ ] Twitter/X, Mastodon, Telegram, Discord
+  [ ] Exploit-DB RSS, HackerOne, CISA KEV, OSV.dev
+
+PHASE 5 — PRODUCTION HARDENING  ❌ NOT STARTED
+  [ ] Docker, Redis, Celery, Prometheus, Grafana, k8s
+
+--------------------------------------------------------------------------------
+  HOW THE FULL SYSTEM WORKS (end to end)
+--------------------------------------------------------------------------------
+
+1. You run: python3 main.py
+   → _bootstrap() loads CVE mentions from disk, registers notifier callback
+   → 4 ingestion workers start as daemon threads (reddit, github, blog, nvd)
+   → API server starts on :8000
+
+2. Each collector polls its source on its interval:
+   Reddit  → every 5 min  → 12 subreddits
+   GitHub  → every 10 min → 25 keyword searches × 3 types (repos/issues/commits)
+   Blog    → every 15 min → 18 RSS feeds
+   NVD     → every 1 hour → CVEs published in last 3 days
+
+3. Every collected item goes through processor.py:
+   [collect] → [signal score] → [NVD enrich] → [novelty check]
+             → [store raw] → [store verified] → [VERIFY (Phase 3)]
+             → [CVE track] → [notify if novel]
+
+4. Phase 3 verification (for novel items only):
+   → Check if GitHub URL has actual exploit code
+   → Extract affected products from text
+   → Score credibility 0-100
+   → Assign status: confirmed / likely / unverified / noise
+   → Save to intel_verification_results
+
+5. CVE tracker watches for spikes:
+   → 3+ mentions of same CVE in 6h = TRENDING
+   → Fires Slack/Discord webhook + email alert
+
+6. Frontend (npm run dev → :5173):
+   → Proxies /api/* to :8000
+   → Dashboard shows live pipeline stats
+   → All Findings shows every stored item
+   → Verified shows Phase 3 results
+   → Trending shows CVE mention rankings
+
+--------------------------------------------------------------------------------
+  HOW TO RUN
+--------------------------------------------------------------------------------
+
+Terminal 1 — Backend:
+  cd evvp-backend
+  python3 main.py
+
+Terminal 2 — Frontend:
+  cd evvp-frontend
+  npm run dev
+
+Open: http://localhost:5173
+
+Watch audit log:
+  tail -f evvp-backend/logs/audit.log
+
+Test API:
+  curl http://localhost:8000/api/health
+  curl http://localhost:8000/api/trending
+  curl http://localhost:8000/api/verified
+  curl http://localhost:8000/api/audit/stats
+
+--------------------------------------------------------------------------------
+  FILES CHANGED TODAY
+--------------------------------------------------------------------------------
+
+NEW:
+  evvp-backend/pipeline/verifier.py          Phase 3 verification engine
+  evvp-frontend/src/pages/Verified.tsx        Verification results UI page
+
+MODIFIED:
+  evvp-backend/storage/db.py                 + intel_verification_results table
+                                             + save_verification()
+                                             + load_verifications()
+                                             + _pg_save_verification()
+                                             + _pg_load_verifications()
+                                             + _json_save_verification()
+                                             + _json_load_verifications()
+
+  evvp-backend/pipeline/processor.py         + verifier.verify() call
+                                             + save_verification() call
+
+  evvp-backend/api/server.py                 + GET /api/verified
+                                             + GET /api/verified/<raw_id>
+                                             + load_verifications import
+
+  evvp-frontend/vite.config.ts               Fixed port (5173) + proxy config
+  evvp-frontend/src/api.ts                   Fixed baseURL + VerificationResult type
+                                             + getVerified() + getVerifiedDetail()
+  evvp-frontend/src/App.tsx                  + /verified route
+  evvp-frontend/src/Layout.tsx               + 🔬 Verified nav item
+
+================================================================================
+  END OF SESSION LOG
+================================================================================
