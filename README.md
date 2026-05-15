@@ -1,0 +1,618 @@
+# Cyber Threat Intelligence Collection System
+
+A production-grade real-time intelligence ingestion and filtering platform for an **Early Vulnerability Verification Platform (EVVP)**.
+
+The system continuously collects, scores, and filters emerging cybersecurity discussions from Reddit, GitHub, and security blogs — surfacing likely real vulnerabilities **before official CVE/NVD confirmation**.
+
+---
+
+## What This System Does
+
+- Collects raw intelligence from Reddit, GitHub, and 13 RSS/blog feeds
+- Runs every collected item through a multi-stage threat relevance scoring engine
+- Filters out educational content, career discussions, tool noise, and CI spam
+- Stores only high-signal vulnerability candidates with full metadata
+- Provides a zero-day hunter CLI to find pre-CVE vulnerability discussions
+- Provides a web dashboard to browse, search, and visualize all collected intelligence
+
+## What This System Does NOT Do
+
+- Classify CVE severity
+- Verify vulnerability credibility
+- Run ML predictions
+- Assign CVSS scores
+
+That is handled separately by the verification engine downstream.
+
+---
+
+## Project Structure
+
+```
+nagal2/
+|
+|-- main.py                        # CLI entry point
+|-- requirements.txt               # Python dependencies
+|-- .env.example                   # Environment variable template
+|-- .env                           # Your actual credentials (git-ignored)
+|-- zero_day_candidates.json       # Exported zero-day hunt results
+|-- cve_vulnerabilities.json       # Exported CVE hunt results
+|
+|-- collectors/
+|   |-- reddit_collector.py        # Reddit public JSON + RSS fallback
+|   |-- github_collector.py        # GitHub API: repos, issues, commits, org issues
+|   |-- blog_collector.py          # RSS/Atom feed ingestion (13 sources)
+|
+|-- config/
+|   |-- settings.py                # All configuration, keywords, feed URLs
+|
+|-- database/
+|   |-- storage.py                 # PostgreSQL + JSON file dual backend
+|
+|-- utils/
+|   |-- signal_filter.py           # Multi-stage threat intelligence filtering engine
+|   |-- zero_day_hunter.py         # Zero-day and CVE vulnerability hunter
+|   |-- logger.py                  # Rotating file + console logging
+|   |-- retry.py                   # Exponential back-off decorator
+|   |-- rate_limiter.py            # Token bucket rate limiter
+|
+|-- scheduler/
+|   |-- runner.py                  # Parallel thread runner with graceful shutdown
+|
+|-- dashboard/
+|   |-- app.py                     # Flask web dashboard server
+|   |-- templates/
+|       |-- dashboard.html         # Full dark-theme UI
+|
+|-- raw_data/
+|   |-- reddit/YYYY-MM-DD.jsonl    # Collected Reddit intelligence
+|   |-- github/YYYY-MM-DD.jsonl    # Collected GitHub intelligence
+|   |-- blog/YYYY-MM-DD.jsonl      # Collected blog/RSS intelligence
+|
+|-- logs/
+    |-- main.log
+    |-- reddit_collector.log
+    |-- github_collector.log
+    |-- blog_collector.log
+    |-- storage.log
+```
+
+---
+
+## Setup
+
+### 1. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2. Configure credentials
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+
+```env
+# GitHub token (required for full rate limits)
+GITHUB_TOKEN=your_github_token
+
+# Reddit API (optional — system falls back to public JSON/RSS without it)
+REDDIT_CLIENT_ID=your_reddit_client_id
+REDDIT_CLIENT_SECRET=your_reddit_client_secret
+REDDIT_USER_AGENT=CyberThreatIntel/1.0
+
+# PostgreSQL (optional — leave empty to use JSON file storage)
+DB_URL=postgresql://user:password@localhost:5432/threat_intel
+
+# Polling intervals in seconds (optional overrides)
+REDDIT_POLL_INTERVAL=300
+GITHUB_POLL_INTERVAL=600
+BLOG_POLL_INTERVAL=900
+```
+
+**Reddit** works without credentials via public JSON endpoint.
+**GitHub** works without a token at 10 req/hour (vs 5000 authenticated).
+
+---
+
+## Usage
+
+### Run all collectors continuously (parallel threads)
+
+```bash
+python main.py
+```
+
+### Run a single collector continuously
+
+```bash
+python main.py --collector reddit
+python main.py --collector github
+python main.py --collector blog
+```
+
+### Single collection pass (for testing or cron jobs)
+
+```bash
+python main.py --once
+python main.py --collector reddit --once
+python main.py --collector github --once
+python main.py --collector blog --once
+```
+
+### Hunt for zero-day and CVE vulnerabilities
+
+```bash
+# Default: last 7 days, min score 10, top 50 results
+python main.py --zeroday
+
+# Custom parameters
+python main.py --zeroday --days 3 --minscore 15 --limit 20
+
+# Run hunter directly (mode: zeroday | cve | both)
+python utils/zero_day_hunter.py both 7 8 50
+python utils/zero_day_hunter.py zeroday 2 12 10
+python utils/zero_day_hunter.py cve 7 6 30
+```
+
+### Launch the web dashboard
+
+```bash
+python dashboard/app.py
+# Open http://localhost:5000
+```
+
+---
+
+## Intelligence Pipeline
+
+Every collected item passes through this pipeline before being stored:
+
+```
+Raw Item (title + text + metadata)
+        |
+        v
+[1] Positive Signal Extraction
+    - 70+ weighted exploit/vuln terms
+    - CVE reference bonus (+4 per CVE, capped at +12)
+        |
+        v
+[2] Negative Signal Detection
+    - 50+ noise/educational terms
+    - Title penalties are doubled
+    - Known noise repo blocklist (-15)
+        |
+        v
+[3] Net Score = positive_score - negative_score
+        |
+        v
+[4] Category Classification
+    - high_confidence_vulnerability_signal  (score >= 14 + exploit keywords)
+    - exploit_development_discussion        (score >= 6 + exploit-dev keywords)
+    - educational_tutorial_content          (noise dominated)
+    - general_cybersecurity_discussion      (everything else)
+        |
+        v
+[5] Threshold Gate
+    - Only high_confidence + exploit_dev pass
+    - Minimum net score: 8
+    - Educational and general content is DROPPED
+        |
+        v
+Stored Intelligence Candidate
+```
+
+---
+
+## Output Schema
+
+Every stored item has this structure:
+
+```json
+{
+  "id": "reddit_abc123",
+  "platform": "reddit | github | blog",
+  "source": "r/netsec",
+  "title": "PAN-OS Captive Portal Zero-Day for Unauthenticated RCE",
+  "text": "...",
+  "author": "username",
+  "timestamp": "2026-05-07T09:27:50+00:00",
+  "url": "https://...",
+  "metadata": {},
+  "signal_score": 31,
+  "category": "high_confidence_vulnerability_signal",
+  "matched_signals": ["zero-day", "remote code execution", "unauthenticated", "rce"],
+  "negative_signals": [],
+  "collected_at": "2026-05-07T09:27:50+00:00"
+}
+```
+
+---
+
+## Signal Scoring Reference
+
+### High-value positive signals (sample)
+
+| Term | Score |
+|------|-------|
+| actively exploited | 10 |
+| exploited in the wild | 10 |
+| 0day / zero-day | 9 |
+| unauthenticated rce | 9 |
+| sandbox escape | 9 |
+| container escape | 9 |
+| kernel exploit | 9 |
+| exploit released / working exploit | 9 |
+| remote code execution | 8 |
+| auth bypass | 8 |
+| memory corruption / use-after-free | 8 |
+| arbitrary code execution | 8 |
+| patch bypass | 8 |
+| rce | 7 |
+| privilege escalation | 7 |
+| shellcode / rop chain | 7 |
+| poc / proof of concept | 6 |
+| CVE reference | +4 each (max 12) |
+
+### Noise penalties (sample)
+
+| Term | Penalty (body) | Penalty (title) |
+|------|---------------|-----------------|
+| how to learn | 10 | 20 |
+| mentorship | 9 | 18 |
+| getting started | 8 | 16 |
+| tutorial | 8 | 16 |
+| dependabot | 9 | 18 |
+| roadmap | 8 | 16 |
+| career | 7 | 14 |
+| certification | 7 | 14 |
+
+---
+
+## Categories
+
+| Category | Stored? | Description |
+|----------|---------|-------------|
+| `high_confidence_vulnerability_signal` | Yes | RCE, auth bypass, PoC, active exploitation, zero-day |
+| `exploit_development_discussion` | Yes | Shellcode, ROP chains, heap grooming, bypass techniques |
+| `educational_tutorial_content` | No (dropped) | Tutorials, courses, beginner guides, CTF writeups |
+| `general_cybersecurity_discussion` | No (dropped) | Career, tools, generic security chat |
+
+---
+
+## Data Sources
+
+### Reddit (8 subreddits)
+
+Collected via public JSON endpoint (`/r/{sub}/new.json`) with RSS fallback.
+No credentials required.
+
+| Subreddit | Focus |
+|-----------|-------|
+| r/netsec | Network security research |
+| r/cybersecurity | General cybersecurity news |
+| r/hacking | Hacking discussions |
+| r/exploitdev | Exploit development |
+| r/bugbounty | Bug bounty findings |
+| r/ReverseEngineering | Reverse engineering |
+| r/blueteamsec | Blue team / threat intel |
+| r/AskNetsec | Security Q&A |
+
+### GitHub (3 search types + org monitoring)
+
+Authenticated via personal access token. Searches across:
+- **Repositories** — sorted by updated date, filtered to post-2020
+- **Issues** — vulnerability discussions and bug reports
+- **Commits** — suspicious commit messages
+
+**Search keywords (25 queries):**
+poc exploit, proof of concept exploit, exploit released, working exploit,
+unauthenticated rce, unauth rce, pre-auth rce, remote code execution poc,
+0day exploit, zero day exploit, zero-day poc, use-after-free exploit,
+heap overflow exploit, memory corruption exploit, privilege escalation exploit,
+lpe exploit, sandbox escape exploit, kernel exploit poc, container escape exploit,
+auth bypass exploit, authentication bypass poc, actively exploited,
+exploited in the wild, exploit chain poc
+
+**Monitored organizations:**
+- googleprojectzero (vulnerability research issues only)
+
+### Security Blogs / RSS Feeds (13 sources)
+
+| Feed | URL |
+|------|-----|
+| The Hacker News | feeds.feedburner.com/TheHackersNews |
+| BleepingComputer | bleepingcomputer.com/feed/ |
+| Dark Reading | darkreading.com/rss.xml |
+| SecurityWeek | securityweek.com/feed/ |
+| Krebs on Security | krebsonsecurity.com/feed/ |
+| Google Project Zero | googleprojectzero.blogspot.com/feeds/posts/default |
+| ProjectDiscovery Blog | blog.projectdiscovery.io/rss/ |
+| PortSwigger Research | portswigger.net/research/rss |
+| Unit 42 (Palo Alto) | unit42.paloaltonetworks.com/feed/ |
+| Microsoft Security | microsoft.com/en-us/security/blog/feed/ |
+| Help Net Security | helpnetsecurity.com/feed/ |
+| CyberScoop | cyberscoop.com/feed/ |
+| Trend Micro Research | trendmicro.com/en_us/research.rss |
+
+---
+
+## Storage
+
+### JSON files (default)
+
+No configuration needed. Files are written to:
+
+```
+raw_data/
+  reddit/YYYY-MM-DD.jsonl
+  github/YYYY-MM-DD.jsonl
+  blog/YYYY-MM-DD.jsonl
+```
+
+One JSON object per line (JSONL format).
+
+### PostgreSQL (optional)
+
+Set `DB_URL` in `.env`. The schema is auto-created on first run:
+
+```sql
+CREATE TABLE raw_intel (
+    id               TEXT PRIMARY KEY,
+    platform         TEXT,
+    source           TEXT,
+    title            TEXT,
+    text             TEXT,
+    author           TEXT,
+    timestamp        TIMESTAMPTZ,
+    url              TEXT,
+    metadata         JSONB,
+    signal_score     INTEGER DEFAULT 0,
+    category         TEXT,
+    matched_signals  JSONB,
+    negative_signals JSONB,
+    collected_at     TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+If PostgreSQL save fails, the system automatically falls back to JSON.
+
+---
+
+## Web Dashboard
+
+```bash
+python dashboard/app.py
+# Open http://localhost:5000
+```
+
+### Dashboard tabs
+
+| Tab | Content |
+|-----|---------|
+| Zero-Days | High-signal items with NO CVE ID (pre-disclosure candidates) |
+| CVEs | Items with CVE IDs actively being discussed |
+| Reddit | All Reddit intelligence sorted by signal score |
+| GitHub | All GitHub intelligence sorted by signal score |
+| Blogs | All blog/RSS intelligence sorted by signal score |
+
+### Dashboard features
+
+- Live stat cards: total items, zero-day count, CVE count, per-platform counts
+- Stacked bar chart: collection timeline over 7 days
+- Donut chart: category breakdown (High Conf / Exploit Dev / Educational / General)
+- Per-item display: signal score badge, category badge, matched signals, CVE tags
+- Full-text search across all collected intelligence
+- Auto-refreshes every 60 seconds
+
+### Dashboard API endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/stats` | Totals, platform counts, category counts, timeline |
+| `GET /api/feed/<platform>` | Recent items for reddit / github / blog |
+| `GET /api/zerodays` | High-signal items with no CVE ID |
+| `GET /api/cves` | Items with CVE IDs |
+| `GET /api/search?q=<query>` | Full-text search |
+
+---
+
+## Zero-Day Hunter
+
+The hunter scans collected data and surfaces the most likely pre-disclosure vulnerabilities.
+
+### Zero-day mode (no CVE ID)
+
+Items are scored with extra boosts for:
+- `zero-day` / `0day` terms (+10)
+- `actively exploited` / `in the wild` (+8)
+- `poc` / `proof of concept` (+5)
+- `unauthenticated rce` (+6)
+- Collected in last 48 hours (+5)
+- Items WITH a CVE ID are excluded (already verified)
+
+### CVE mode (with CVE ID)
+
+Items that contain CVE references and have a high signal score — these are disclosed vulnerabilities being actively discussed, with PoCs or active exploitation chatter.
+
+### Output files
+
+- `zero_day_candidates.json` — pre-CVE vulnerability candidates
+- `cve_vulnerabilities.json` — CVE-tagged high-signal discussions
+
+---
+
+## Rate Limiting
+
+| Source | Limit | Notes |
+|--------|-------|-------|
+| Reddit | ~1 req/sec | Public JSON endpoint, no auth needed |
+| GitHub (unauthenticated) | 10 req/hour | Very limited |
+| GitHub (authenticated) | 5000 req/hour | Set `GITHUB_TOKEN` in `.env` |
+| RSS feeds | No limit | Polite 20s timeout per feed |
+
+GitHub collector uses a token bucket rate limiter set to 200 req/hour by default (configurable in `config/settings.py`).
+
+---
+
+## Logging
+
+All modules write rotating logs to `logs/`:
+
+```
+logs/
+  main.log
+  reddit_collector.log
+  github_collector.log
+  blog_collector.log
+  storage.log
+  retry.log
+  scheduler.log
+```
+
+- Max file size: 10 MB per log
+- Backup count: 5 rotated files
+- Format: `YYYY-MM-DD HH:MM:SS [LEVEL] module: message`
+- Also printed to console
+
+---
+
+## Polling Intervals
+
+| Collector | Default | Override via `.env` |
+|-----------|---------|---------------------|
+| Reddit | 300s (5 min) | `REDDIT_POLL_INTERVAL` |
+| GitHub | 600s (10 min) | `GITHUB_POLL_INTERVAL` |
+| Blog/RSS | 900s (15 min) | `BLOG_POLL_INTERVAL` |
+
+---
+
+## Configurable Thresholds
+
+All thresholds are in `utils/signal_filter.py`:
+
+```python
+MIN_SIGNAL_SCORE      = 8   # drop items below this net score
+EXPLOIT_DEV_MIN_SCORE = 6   # minimum for exploit_development_discussion
+HIGH_CONF_MIN_SCORE   = 14  # minimum for high_confidence_vulnerability_signal
+```
+
+---
+
+## Extending the System
+
+### Add a new collector
+
+1. Create `collectors/my_collector.py` with `run_once()` and `run_continuous()`
+2. Use `analyze()` from `utils/signal_filter.py` to score items before saving
+3. Use `save()` from `database/storage.py` to persist
+4. Register in `scheduler/runner.py` and `main.py`
+
+### Add new signal terms
+
+Edit `POSITIVE_SIGNALS` or `NEGATIVE_SIGNALS` in `utils/signal_filter.py`.
+
+### Add new RSS feeds
+
+Add the feed URL to `RSS_FEEDS` in `config/settings.py`.
+
+### Add new GitHub search keywords
+
+Add to `GITHUB_KEYWORDS` in `config/settings.py`.
+
+---
+
+## Planned Future Sources
+
+The system is designed to support these additional sources:
+
+- Twitter / X
+- Telegram channels
+- Discord servers
+- Mastodon
+- Dark web forums
+- HackerOne public disclosures
+- NVD/MITRE feed integration
+- Exploit-DB RSS
+
+---
+
+## Dependencies
+
+```
+praw>=7.7           # Reddit API (optional)
+feedparser>=6.0     # RSS/Atom feed parsing
+requests>=2.31      # HTTP client
+python-dotenv>=1.0  # .env file loading
+psycopg2-binary>=2.9 # PostgreSQL (optional)
+flask>=3.0          # Web dashboard
+```
+
+Install all:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Quick Start (no credentials)
+
+```bash
+pip install -r requirements.txt
+cp .env.example .env
+
+# Single collection pass
+python main.py --once
+
+# Hunt for zero-days in collected data
+python main.py --zeroday
+
+# Launch dashboard
+python dashboard/app.py
+# Open http://localhost:5000
+```
+
+---
+
+## Architecture Summary
+
+```
+Internet Sources
+    |
+    +-- Reddit (public JSON + RSS)
+    +-- GitHub API (repos, issues, commits)
+    +-- RSS/Blog feeds (13 sources)
+    |
+    v
+Collectors (reddit_collector, github_collector, blog_collector)
+    |
+    v
+Signal Filter (utils/signal_filter.py)
+    |-- Positive scoring  (70+ exploit/vuln terms)
+    |-- Negative scoring  (50+ noise/educational terms)
+    |-- Net score calculation
+    |-- Category classification (4 tiers)
+    |-- Threshold gate (drop educational + general)
+    |
+    v
+Storage (database/storage.py)
+    |-- PostgreSQL (if DB_URL set)
+    |-- JSON JSONL files (default fallback)
+    |
+    v
+Zero-Day Hunter (utils/zero_day_hunter.py)
+    |-- Pre-CVE candidates (no CVE ID, high score)
+    |-- CVE-tagged discussions (high score + CVE reference)
+    |
+    v
+Web Dashboard (dashboard/app.py)
+    |-- Zero-Days tab
+    |-- CVEs tab
+    |-- Reddit / GitHub / Blog tabs
+    |-- Search
+    |-- Charts + Stats
+```

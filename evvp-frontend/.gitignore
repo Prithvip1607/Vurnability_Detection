@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.pyc
+__pycache__/
+.env
+logs/
+raw_data/
+*.jsonl
+!.env.example
