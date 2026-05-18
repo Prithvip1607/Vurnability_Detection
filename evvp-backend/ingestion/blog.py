@@ -2,6 +2,8 @@
 Blog / RSS ingestion — 18 security feeds.
 """
 import hashlib
+import html
+import re
 import time
 
 import feedparser
@@ -14,6 +16,14 @@ from utils.retry import retry
 
 logger = get_logger("ingestion.blog")
 _HEADERS = {"User-Agent": "EVVP/1.0 (RSS Collector)"}
+
+
+def _to_plain(raw: str) -> str:
+    """Strip HTML tags and decode entities to plain text."""
+    text = re.sub(r"<[^>]+>", " ", raw)        # remove tags
+    text = html.unescape(text)                   # &amp; &lt; etc.
+    text = re.sub(r"\s+", " ", text).strip()    # collapse whitespace
+    return text
 
 
 def _item_id(feed_url: str, entry_id: str) -> str:
@@ -34,11 +44,12 @@ def _fetch_feed(feed_url: str) -> tuple[int, int]:
         fetched += 1
         entry_id  = entry.get("id") or entry.get("link", "")
         published = entry.get("published") or entry.get("updated") or entry.get("created") or ""
-        content   = ""
+        content = ""
         if entry.get("content"):
             content = entry.content[0].get("value", "")
         elif entry.get("summary"):
             content = entry.summary
+        content = _to_plain(content)
 
         item = {
             "id":       _item_id(feed_url, entry_id),

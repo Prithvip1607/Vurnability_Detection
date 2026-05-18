@@ -2,6 +2,7 @@
 REST API — exposes collected intel + trending CVEs for the frontend.
 All responses are JSON. No HTML.
 """
+import html
 import re
 import threading
 import time
@@ -20,7 +21,23 @@ app    = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 logger = get_logger("api")
 
-_CVE_RE = re.compile(r"CVE-\d{4}-\d+", re.IGNORECASE)
+_CVE_RE   = re.compile(r"CVE-\d{4}-\d+", re.IGNORECASE)
+_HTML_TAG = re.compile(r"<[^>]+>")
+
+
+def _strip_html(text: str) -> str:
+    if not text or "<" not in text:
+        return text
+    text = _HTML_TAG.sub(" ", text)
+    text = html.unescape(text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _clean(item: dict) -> dict:
+    """Strip HTML from text field before sending to frontend."""
+    if item.get("text"):
+        item["text"] = _strip_html(item["text"])
+    return item
 
 # ── TTL cache ─────────────────────────────────────────────────────────────────
 _CACHE: dict = {}
@@ -52,7 +69,7 @@ def _paginate(items: list, page: int, per_page: int) -> dict:
 
 
 def _get_items(days: int = 7) -> list[dict]:
-    return _cached(f"items_{days}", lambda: load_recent_raw(days=days))
+    return _cached(f"items_{days}", lambda: [_clean(i) for i in load_recent_raw(days=days)])
 
 
 def _parse_ts(ts: str | None) -> datetime | None:
