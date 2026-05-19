@@ -55,9 +55,11 @@ CREATE TABLE IF NOT EXISTS intel_raw (
     matched_signals   JSONB DEFAULT '[]',
     negative_signals  JSONB DEFAULT '[]',
     collected_at      TIMESTAMPTZ DEFAULT NOW(),
-    sources           JSONB DEFAULT '[]'
+    sources           JSONB DEFAULT '[]',
+    summary           TEXT
 );
 ALTER TABLE intel_raw ADD COLUMN IF NOT EXISTS sources JSONB DEFAULT '[]';
+ALTER TABLE intel_raw ADD COLUMN IF NOT EXISTS summary TEXT;
 CREATE INDEX IF NOT EXISTS idx_intel_platform    ON intel_raw(platform);
 CREATE INDEX IF NOT EXISTS idx_intel_score       ON intel_raw(signal_score DESC);
 CREATE INDEX IF NOT EXISTS idx_intel_collected   ON intel_raw(collected_at DESC);
@@ -211,8 +213,8 @@ def _pg_save_raw(item: dict[str, Any]) -> None:
                 cur.execute("""
                     INSERT INTO intel_raw
                         (id, platform, source, title, body, author, source_ts, url,
-                         metadata, signal_score, category, matched_signals, negative_signals, sources)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                         metadata, signal_score, category, matched_signals, negative_signals, sources, summary)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                     ON CONFLICT (id) DO NOTHING
                 """, (
                     item.get("id"), item.get("platform"), item.get("source"),
@@ -223,6 +225,7 @@ def _pg_save_raw(item: dict[str, Any]) -> None:
                     psycopg2.extras.Json(item.get("matched_signals", [])),
                     psycopg2.extras.Json(item.get("negative_signals", [])),
                     psycopg2.extras.Json(item.get("sources", [])),
+                    item.get("summary", ""),
                 ))
             conn.commit()
         finally:

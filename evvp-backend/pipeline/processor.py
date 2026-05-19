@@ -2,11 +2,12 @@
 Pipeline orchestrator — every collected item passes through:
   1. Signal scoring   (signal_filter)
   2. NVD enrichment   (nvd_enricher)
-  3. Novelty check    (novelty)
-  4. Storage          (storage.db)
-  5. CVE trend track  (tracker)
-  6. Notification     (notifier)
-  7. Audit log        (utils.audit)
+  3. AI Summary       (summarizer) ← NEW
+  4. Novelty check    (novelty)
+  5. Storage          (storage.db)
+  6. CVE trend track  (tracker)
+  7. Notification     (notifier)
+  8. Audit log        (utils.audit)
 """
 from __future__ import annotations
 import re
@@ -15,6 +16,7 @@ from datetime import datetime, timezone
 
 from pipeline.signal_filter import analyze
 from pipeline.nvd_enricher  import enrich
+from pipeline.summarizer    import generate_summary
 from pipeline.novelty        import check as novelty_check
 from pipeline.tracker        import record as track_cves
 from pipeline.notifier       import dispatch
@@ -73,7 +75,16 @@ def process(item: dict) -> bool:
               cve_ids=item.get("cve_ids", []),
               nvd_count=len(item["nvd_data"]))
 
-    # 3. Novelty check
+    # 3. AI Summary generation
+    try:
+        summary = generate_summary(item)
+        item["summary"] = summary
+        logger.debug("Generated summary for %s: %.100s", item.get("id", "?"), summary)
+    except Exception as e:
+        logger.warning("Summary generation failed: %s", e)
+        item["summary"] = ""
+
+    # 4. Novelty check
     if _cache_counter % _CACHE_REFRESH == 0:
         _refresh_cache()
     _cache_counter += 1

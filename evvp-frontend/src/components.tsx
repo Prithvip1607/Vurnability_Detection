@@ -32,6 +32,30 @@ export function timeAgo(ts: string) {
   return `${Math.floor(h / 24)}d ago`
 }
 
+// Strip HTML tags and decode entities
+export function stripHtml(html: string): string {
+  if (!html) return ''
+  const tmp = document.createElement('div')
+  tmp.innerHTML = html
+  return tmp.textContent || tmp.innerText || ''
+}
+
+// Format description: strip HTML, truncate, make concise
+export function formatDescription(text: string, maxLength = 200): string {
+  if (!text) return 'No description available'
+  const clean = stripHtml(text).trim()
+  if (clean.length <= maxLength) return clean
+  return clean.slice(0, maxLength).trim() + '...'
+}
+
+// Convert long text to bullet points (split by sentences)
+export function toBulletPoints(text: string, maxPoints = 3): string[] {
+  if (!text) return []
+  const clean = stripHtml(text).trim()
+  const sentences = clean.split(/[.!?]+/).filter(s => s.trim().length > 20)
+  return sentences.slice(0, maxPoints).map(s => s.trim())
+}
+
 export function formatDate(ts: string) {
   if (!ts) return '—'
   try {
@@ -87,6 +111,7 @@ export function VulnCard({ item }: { item: IntelItem }) {
   const [open, setOpen] = useState(false)
   const severity = severityFromScore(item.signal_score)
   const cves = item.cve_ids || []
+  const summary = item.summary || formatDescription(item.text, 180)
 
   let rowClass = 'post-row'
   if (cves.length > 0) rowClass += ' has-cve'
@@ -97,7 +122,22 @@ export function VulnCard({ item }: { item: IntelItem }) {
     <>
       <div className={rowClass} onClick={() => setOpen(true)}>
         <ScoreBadge score={item.signal_score} />
-        <div className="post-row-title">{item.title}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="post-row-title">{item.title}</div>
+          {/* AI-generated summary */}
+          <div style={{ 
+            fontSize: 13, 
+            color: 'var(--text3)', 
+            marginTop: 4,
+            lineHeight: 1.4,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden'
+          }}>
+            {summary}
+          </div>
+        </div>
         <div className="post-row-meta">
           <PlatformBadge platform={item.platform} />
           <SeverityBadge severity={severity} />
@@ -157,7 +197,29 @@ function PostDetail({ item, onClose }: { item: IntelItem; onClose: () => void })
         {desc && (
           <div className="drawer-section">
             <div className="drawer-label">Description</div>
-            <div className="drawer-desc">{desc}</div>
+            {item.platform === 'blog' ? (
+              <div className="drawer-desc" style={{ lineHeight: 1.6 }}>
+                {toBulletPoints(desc, 5).map((point, i) => (
+                  <div key={i} style={{ marginBottom: 8, paddingLeft: 16, position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: 0, color: 'var(--accent)' }}>•</span>
+                    {point}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="drawer-desc" style={{ lineHeight: 1.6 }}>
+                {toBulletPoints(desc, 4).length > 0 ? (
+                  toBulletPoints(desc, 4).map((point, i) => (
+                    <div key={i} style={{ marginBottom: 8, paddingLeft: 16, position: 'relative' }}>
+                      <span style={{ position: 'absolute', left: 0, color: 'var(--accent)' }}>•</span>
+                      {point}
+                    </div>
+                  ))
+                ) : (
+                  <div>{stripHtml(desc)}</div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

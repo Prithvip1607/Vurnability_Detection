@@ -20,6 +20,7 @@ export interface IntelItem {
   nvd_data?: NVDRecord[]
   metadata?: Record<string, unknown>
   sources?: { url: string; platform: string }[]
+  summary?: string
 }
 
 export interface NVDRecord {
