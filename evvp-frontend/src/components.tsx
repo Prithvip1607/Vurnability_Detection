@@ -178,6 +178,20 @@ function PostDetail({ item, onClose }: { item: IntelItem; onClose: () => void })
               <span className="vuln-meta-sep">|</span>
               <span style={{ fontSize: 12, color: 'var(--text3)' }}>📅 {formatDate(item.timestamp || item.collected_at)}</span>
               {item.author && <><span className="vuln-meta-sep">|</span><span style={{ fontSize: 12, color: 'var(--text3)' }}>👤 {item.author}</span></>}
+              {sources.length > 0 && (
+                <>
+                  <span className="vuln-meta-sep">|</span>
+                  <a 
+                    href={sources[0].url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    🔗 Source ↗
+                  </a>
+                </>
+              )}
             </div>
           </div>
           <button className="drawer-close" onClick={onClose}>✕</button>
