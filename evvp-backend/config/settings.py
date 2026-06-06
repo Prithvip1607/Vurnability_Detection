@@ -24,9 +24,9 @@ NVD_POLL_INTERVAL    = int(os.getenv("NVD_POLL_INTERVAL",   3600))
 GITHUB_REQUESTS_PER_HOUR = 200   # conservative; authenticated = 5000/hr
 
 # ── Pipeline thresholds ───────────────────────────────────────────────────────
-MIN_SIGNAL_SCORE      = 8    # drop items below this
-EXPLOIT_DEV_MIN_SCORE = 6
-HIGH_CONF_MIN_SCORE   = 14
+MIN_SIGNAL_SCORE      = 4    # drop items below this
+EXPLOIT_DEV_MIN_SCORE = 4
+HIGH_CONF_MIN_SCORE   = 10
 NOVELTY_LOOKBACK_DAYS = 30   # how far back to check for duplicate titles
 
 # ── Reddit subreddits ─────────────────────────────────────────────────────────

@@ -68,7 +68,7 @@ def _paginate(items: list, page: int, per_page: int) -> dict:
     }
 
 
-def _get_items(days: int = 7) -> list[dict]:
+def _get_items(days: int = 30) -> list[dict]:
     return _cached(f"items_{days}", lambda: [_clean(i) for i in load_recent_raw(days=days)])
 
 
