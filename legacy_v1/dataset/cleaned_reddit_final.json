@@ -1,0 +1,1602 @@
+[
+    {
+        "text": "cve-2024-11477- 7-zip zstd buffer overflow vulnerability - crowdfense",
+        "label": "HIGH"
+    },
+    {
+        "text": "sysowned, your friendly support ticket - sysaid on-premise pre-auth rce chain (cve-2025-2775 and friends) - watchtowr labs",
+        "label": "HIGH"
+    },
+    {
+        "text": "samsung magicinfo unauthenticated rce magicinfo exposes an endpoint with several flaws that, when combined, allow an unauthenticated attacker to upload a jsp file and execute arbitrary server-side code.",
+        "label": "HIGH"
+    },
+    {
+        "text": "hello 0-days, my old friend: a 2024 zero-day exploitation analysis",
+        "label": "HIGH"
+    },
+    {
+        "text": "shadow roles: aws defaults can open the door to service takeover tl;dr:\nwe discovered that aws services like sagemaker, glue, and emr generate default iam roles with overly broad permissions\u2014including full access to all s3 buckets.\nthese default roles can be exploited to escalate privileges, pivot between services, and even take over entire aws accounts.\nfor example, importing a malicious hugging face model into sagemaker can trigger code execution that compromises other aws services.\nsimilarly, a user with access only to the glue service could escalate privileges and gain full administrative control.\naws has made fixes and notified users, but many environments remain exposed because these roles still exist\u2014and many open-source projects continue to create similarly risky default roles.",
+        "label": "HIGH"
+    },
+    {
+        "text": "prokzee \u2013 an open-source network security tool written in go hi everyone,\n\ni want to share prokzee, a free and open-source network security tool built with go and react using wails framework.\n\nprokzee allows developers, security researchers, and penetration testers to intercept, inspect, and modify http/s traffic \u2014 similar to tools like burp suite, owasp zap, and caido \u2014 but with a fast native ui, modern ux, and some unique features.\n\n[https://github.com/al-sultani/prokzee](https://github.com/al-sultani/prokzee)\n\ncontributions are more than welcome! star the repo if you like the project.\n\nthanks!",
+        "label": "HIGH"
+    },
+    {
+        "text": "ghosting amsi: cutting rpc to disarm av \ud83d\udee1 amsi bypass via rpc hijack (ndrclientcall3) this technique exploits the com-level mechanics amsi uses when delegating scan requests to antivirus (av) providers through rpc. by hooking into the ndrclientcall3 function\u2014used internally by the rpc runtime to marshal and dispatch function calls\u2014we intercept amsi scan requests before they're serialized and sent to the av engine.",
+        "label": "HIGH"
+    },
+    {
+        "text": "2 new uaf vulnerabilities in chrome use-after-free (uaf) vulnerabilities within the chrome browser process have frequently been a key vector for sandbox escapes. these flaws could have led to critical exploits in the past, but thanks to chrome\u2019s latest security technology, miracleptr, they are no longer exploitable.",
+        "label": "HIGH"
+    },
+    {
+        "text": "cross-site websocket hijacking exploitation in 2025 - include security research blog",
+        "label": "HIGH"
+    },
+    {
+        "text": "new writeup: a vulnerability in php's extract() function allows attackers to trigger a double-free, which in turn allows arbitrary code execution (native code)",
+        "label": "HIGH"
+    },
+    {
+        "text": "azure managed identities resource (background, attacker and defender perspective) this is by far the best resource out there",
+        "label": "HIGH"
+    },
+    {
+        "text": "how a critical rce vulnerability in calix's cwmp service allows attackers to execute system commands as root due to improper input sanitization, leading to full system compromise.",
+        "label": "HIGH"
+    },
+    {
+        "text": "how a a critical rce vulnerability in calix's cwmp service allows attackers to execute system commands as root due to improper input sanitization, leading to full system compromise.",
+        "label": "HIGH"
+    },
+    {
+        "text": "read how a a critical rce vulnerability in calix's cwmp service allows attackers to execute system commands as root due to improper input sanitization, leading to full system compromise. published on [https://ssd-disclosure.com/ssd-advisory-calix-pre-auth-rce/](https://ssd-disclosure.com/ssd-advisory-calix-pre-auth-rce/)",
+        "label": "HIGH"
+    },
+    {
+        "text": "cve-2025-22457: python exploit poc scanner to detect ivanti connect secure rce",
+        "label": "HIGH"
+    },
+    {
+        "text": "unsafe at any speed: abusing python exec for unauth rce in langflow ai",
+        "label": "HIGH"
+    },
+    {
+        "text": "open-source compliance we\u2019ve been working on something for the past few months and it's finally live: comp ai.\n\ngetting compliant with things like soc 2, iso 27001, and gdpr usually costs startups $15k+ a year (and a lot of headaches). \n\nwe built something to make that way easier \u2014 and more affordable.\n\nai has changed how fast people can build apps. we're trying to do the same for how they sell them \u2014 especially when it comes to security reviews and enterprise compliance.\n\nif you're into open source or just want to see a new take on the compliance pain, check it out.\n\nwe're live on product hunt today: https://www.producthunt.com/posts/comp-ai-get-soc-2-iso-27001-gdpr\n\nthis is an open-source solution that we think was very necessary. \n\ncompliance doesn't have to be a black box.\n\nwould love to hear what you think. open to feedback!",
+        "label": "HIGH"
+    },
+    {
+        "text": "suspected china-nexus threat actor actively exploiting critical ivanti connect secure vulnerability (cve-2025-22457)",
+        "label": "HIGH"
+    },
+    {
+        "text": "finding an unauthenticated rce nday in zendto, patched quietly in 2021. lots of vulnerable instances exposed to the internet.",
+        "label": "HIGH"
+    },
+    {
+        "text": "[tool] cve-dash: open source terminal-based vulnerability explorer",
+        "label": "HIGH"
+    },
+    {
+        "text": "llama's paradox - delving deep into llama.cpp and exploiting llama.cpp's heap maze, from heap-overflow to remote-code execution",
+        "label": "HIGH"
+    },
+    {
+        "text": "cve-2024-55963: unauthenticated rce in default-install of appsmith",
+        "label": "HIGH"
+    },
+    {
+        "text": "the firewall project (application security with enterprise features) is now open-source",
+        "label": "HIGH"
+    },
+    {
+        "text": "kereva scanner: an open-source llm security (and performance) scanner",
+        "label": "HIGH"
+    },
+    {
+        "text": "bypassing authentication like it\u2019s the \u201890s - pre-auth rce chain(s) in kentico xperience cms - watchtowr labs",
+        "label": "HIGH"
+    },
+    {
+        "text": "cve-2025-24016: unsafe deserialization vulnerability in wazuh leading to remote code execution",
+        "label": "HIGH"
+    },
+    {
+        "text": "i\u2019ve been exploring some of the public camera resources available online, and i came across zoomeye hub, which seems pretty interesting. it lets you search for cameras globally, from security surveillance to smart home devices.",
+        "label": "HIGH"
+    },
+    {
+        "text": "cradle.sh - an open-source post exploitation framework for security teams \ud83d\udd25 stumbled across cradle.sh \u2013 an open-source post-exploitation framework that\u2019s lightweight, stealthy, and actually useful. no bloated ui, just a slick, modular tool that works across windows, linux, and macos.",
+        "label": "HIGH"
+    },
+    {
+        "text": "hello r/netsec community,\n\nintroducing veilgen master \u2013 a powerful open-source python tool for generating realistic fake data, including names, emails, addresses, credit card numbers, imeis, and more. designed for penetration testing, privacy research, and security analysis, it supports secure encry",
+        "label": "HIGH"
+    },
+    {
+        "text": "pre-authentication sql injection to rce in glpi (cve-2025-24799/cve-2025-24801)",
+        "label": "HIGH"
+    },
+    {
+        "text": "the impact of inconsistencies in poc reports (vulnerability reports with poc information) on security assessments",
+        "label": "HIGH"
+    },
+    {
+        "text": "evilloader: yesterday was published poc for unpatched vulnerability affecting telegram for android",
+        "label": "HIGH"
+    },
+    {
+        "text": "we deliberately exposed aws keys on developer forums: attackers exploited one in 10 hours",
+        "label": "HIGH"
+    },
+    {
+        "text": "new attack - xss for seo - hundreds are exploited in the wild !!",
+        "label": "HIGH"
+    },
+    {
+        "text": "55 security flaws detected by microsoft: 2 were exploited by hackers",
+        "label": "HIGH"
+    },
+    {
+        "text": "roping our way to \"yay, rce\" - follow michaels journey of developing an arm rop chain to exploit a buffer overflow in uc-http. dive into the process of reverse engineering, gadget hunting, and crafting a working exploit.",
+        "label": "HIGH"
+    },
+    {
+        "text": "cve-2024-46506: unauthenticated rce in netalertx",
+        "label": "HIGH"
+    },
+    {
+        "text": "practising heap exploitation: using house of force technique with practicals",
+        "label": "HIGH"
+    },
+    {
+        "text": "don't let these open-source tools slip under your radar - help net security",
+        "label": "HIGH"
+    },
+    {
+        "text": "static source code security scanning tools evaluation benchmark",
+        "label": "HIGH"
+    },
+    {
+        "text": "scanner and attack suite for hosts that forward unauthenticated packets via ipip and gre protocols",
+        "label": "HIGH"
+    },
+    {
+        "text": "an independent security researcher collaborating with ssd secure disclosure has identified a critical rce vulnerability in palo alto expedition.",
+        "label": "HIGH"
+    },
+    {
+        "text": "rce in rsync, cve-2024-12084 (and 5 more vulnerabilities) \"in the most severe cve, an attacker only requires\nanonymous read access to a rsync server, such as a public mirror, to execute arbitrary code on the machine the server is running on.\"",
+        "label": "HIGH"
+    },
+    {
+        "text": "new microsoft ole vulnerability, exploitable via email",
+        "label": "HIGH"
+    },
+    {
+        "text": "threat actors exploit a probable 0-day in exposed management consoles of fortinet fortigate firewalls https://www.orangecyberdefense.com/global/blog/cert-news/0-day-in-exposed-management-consoles-of-fortinet-fortigate-firewalls",
+        "label": "HIGH"
+    },
+    {
+        "text": "exploitation walkthrough and techniques - ivanti connect secure rce (cve-2025-0282) - watchtowr labs",
+        "label": "HIGH"
+    },
+    {
+        "text": "organized my security bookmarks into a github repo (300+ sources)",
+        "label": "HIGH"
+    },
+    {
+        "text": "argo workflows - uncovering the hidden misconfigurations over the past year, during our active cloud security penetration testing engagements, we have consistently identified a pattern of recurring misconfigurations in our clients' environments, particularly in their argo workflows instances. these misconfigurations have created exploitable conditions, allowing us to compromise clusters, escalate privileges, and conduct lateral movements - ultimately gaining kubernetes cluster-admin access.",
+        "label": "HIGH"
+    },
+    {
+        "text": "remote code execution (rce) exploits | cve-2024-6782 | ocsaly academy",
+        "label": "HIGH"
+    },
+    {
+        "text": "aws introduced same rce vulnerability three times in four years",
+        "label": "HIGH"
+    },
+    {
+        "text": "nfs security: identifying and exploiting misconfigurations",
+        "label": "HIGH"
+    },
+    {
+        "text": "fortinet warns of critical fortiwlm flaw that could lead to admin access exploits",
+        "label": "HIGH"
+    },
+    {
+        "text": "attackers exploit microsoft teams and anydesk to deploy darkgate malware",
+        "label": "HIGH"
+    },
+    {
+        "text": "cisa and fbi raise alerts on exploited flaws and expanding hiatusrat campaign",
+        "label": "HIGH"
+    },
+    {
+        "text": "microsoft enforces defenses preventing ntlm relay attacks - help net security",
+        "label": "HIGH"
+    },
+    {
+        "text": "300k+ prometheus servers and exporters exposed to dos attack tldr:\nin this research, we uncover flaws in the prometheus ecosystem, including information disclosure, denial-of-service (dos), and remote code execution risks via repojacking of prometheus exporters. over 336,000 prometheus servers and node exporters are publicly exposed.",
+        "label": "HIGH"
+    },
+    {
+        "text": "requestshield: open-source and free log security analyzer",
+        "label": "HIGH"
+    },
+    {
+        "text": "prototype pollution in nasas open mct cve-2023-45282 in the article, i discuss a prototype pollution vulnerability (cve-2023-45282) found in nasa's open mct. this flaw in javascript allows attackers to alter object prototypes, potentially leading to serious outcomes like privilege escalation or remote code execution (rce). i explain how the vulnerability occurs in the \"import from json\" feature, which can crash the application or lead to more dangerous exploits. fortunately, nasa responded quickly to fix the issue, but it highlights the importance of securing deep merge operations in javascript.\n\nthis security research was originally published at visionspace blog (https://visionspace.com/prototype-pollution-in-nasas-open-mct-cve-2023-45282/).",
+        "label": "HIGH"
+    },
+    {
+        "text": "leveraging an order of operations bug to achieve rce in sitecore 8.x - 10.x",
+        "label": "HIGH"
+    },
+    {
+        "text": "remediation for cve-2024-20767 and cve-2024-21216 potential exploitable bugs",
+        "label": "HIGH"
+    },
+    {
+        "text": "github - chebuya/sastsweep: automatically detect potential vulnerabilities and analyze repository metrics to prioritize open source security research targets",
+        "label": "HIGH"
+    },
+    {
+        "text": "beyond rce: autonomous code execution in agentic ai",
+        "label": "HIGH"
+    },
+    {
+        "text": "why falco\u2019s new response engine is a game changer for open source cloud native security",
+        "label": "HIGH"
+    },
+    {
+        "text": "\u201ccrossbarking\u201d \u2014 exploiting a 0-day opera vulnerability with a cross-browser extension store attack",
+        "label": "HIGH"
+    },
+    {
+        "text": "exploiting a blind format string vulnerability in modern binaries: a case study from pwn2own ireland 2024",
+        "label": "HIGH"
+    },
+    {
+        "text": "mastering memory exploitation: fundamentals, stack overflows, shellcode, format string bugs, and heap overflows",
+        "label": "HIGH"
+    },
+    {
+        "text": "what are my options? cyberpanel v2.3.6 pre-auth rce",
+        "label": "HIGH"
+    },
+    {
+        "text": "auth rce in multiple xerox printer series there were even two more unauthenticated rce and authentication bypass issues found, xerox already patched those in the past, but did not mention them in their security notes? \ud83e\udd14",
+        "label": "HIGH"
+    },
+    {
+        "text": "[poc] sap note 3433192 - code injection vulnerability in sap netweaver as java",
+        "label": "HIGH"
+    },
+    {
+        "text": "axis camera takeover alternative  getting rce on axis cameras via malicious app upload is nothing new. this post describes an alternative if the public poc fails.",
+        "label": "HIGH"
+    },
+    {
+        "text": "vmware hacked as $150,000 zero-day exploit dropped",
+        "label": "HIGH"
+    },
+    {
+        "text": "what do you look for when approving software for use at your company? i'm curious what others in the cybersecurity field are looking for when determining what software should be permitted on employee computers and elsewhere on the company network. the first obvious things to look for appear to be: \n\n* outstanding vulnerabilities\n* recent security patches showing the software is well-supported\n* sast/vulnerability scan results or software supply chain documentation if you can get it (you typically can't for cots sw)\n* make sure the company isn't embargoed and doesn't have its main presence in a hostile or high-risk country\n* list capabilities to understand the attack surface of the software and how it affects the attack surface of the host system\n\nanything else? how do you score the things you look for?",
+        "label": "HIGH"
+    },
+    {
+        "text": "breathing brute force hi, i was thinking about what if we rotated parameters to break brute force algorithms? like, just think, they need something fixed, so what if params like password or user changes between n minutes or time, i was thinking about that and i think that can work because in my logic, the tools would try to break the password, but the result would return to error, i think we can add another layers of security to support that imo, but i need to apply that and test it, but im just a mobile user.\nwriten by taldoempirista..",
+        "label": "HIGH"
+    },
+    {
+        "text": "13 cybersecurity news worth your attention this week (2/4 may 2025) each week i spend hours going through 20+ different cybersecurity news sources to find and summarise most interesting news from the week so you can quickly catch up on only the most interesting cyber news quickly.\n\nanyone who has been reading these for the last month, all feedback is very welcome! what works, what is useless?",
+        "label": "HIGH"
+    },
+    {
+        "text": "how critical is content-security-policy in security header and are there risks without it even with a waf? i\u2019m exploring the role of content security policy (csp) in securing websites. from what i understand, csp helps prevent attacks like cross-site scripting (xss) by controlling which resources a browser can load. but how critical is it in practice? if a website already has a web application firewall (waf) in place, does skipping csp pose significant risks? for example, could xss or other script-based attacks still slip through? i\u2019m also curious about real-world cases\u2014have you seen incidents where the absence of csp caused major issues, even with a waf? lastly, how do you balance csp\u2019s benefits with its implementation challenges (e.g., misconfigurations breaking sites)? looking forward to your insights!",
+        "label": "HIGH"
+    },
+    {
+        "text": "why doesn't the u.s. have a unified cybersecurity authority for critical infrastructure? given the increasing sophistication of cyber threats and their potential to disrupt national infrastructure, why doesn't the u.s. have a unified, central authority that enforces cybersecurity standards across both public and private critical infrastructure sectors?",
+        "label": "HIGH"
+    },
+    {
+        "text": "built a chrome extension to help staff spot phishing\u2014feedback welcome hey all,\n\ni\u2019ve been a k\u201312 technology director in a k12 school district for almost three decades, and like many of you, i\u2019ve dealt with phishing targeting employees way too much. after a nearly successful man in the middle attack on one of our employees, i decided to build a  chrome extension that surfaces the **real sender in gmail**, shows **hover previews of links**, and warns about **known sketchy domains**\u2014essentially just-in-time phishing awareness.  every popup is front and center where it belongs.\n\nwe\u2019re piloting it in my district and i'm hopeful that it encourages end users to know what's going on when they open emails and browse the web.\n\nhere\u2019s the link to my extension if anyone wants to test it out.\n\n\ud83d\udd17 [chrome web store \u2013 security assistant](https://chromewebstore.google.com/detail/gpgfdlddmpknmljhoeffodnbjpcgfdap?utm_source=item-share-cb)\n\nopen to feedback, suggestions, or constructive criticism.",
+        "label": "HIGH"
+    },
+    {
+        "text": "poc exploit for achieving sysaid pre-auth rce released",
+        "label": "HIGH"
+    },
+    {
+        "text": "introducing subhunterx \u2013 my open-source recon automation tool for bug bounty hunters i created **subhunterx** to automate and streamline the recon process in bug bounty hunting. it brings together tools like subfinder, amass, httpx, ffuf, katana, and gf into one unified workflow to boost speed, coverage, and efficiency.\n\nkey features:\n\n* subdomain enumeration (active + passive)\n* dns resolution and ip mapping\n* live host detection, crawling, fuzzing\n* vulnerability pattern matching using gf\n\nthis is just the beginning. i'm actively working on improving it, and i need your support.\n\nif you're into recon, automation, or bug bounty hunting \u2014 please contribute, share feedback, report issues, or open a pull request. let's make subhunterx more powerful, reliable, and usable for the whole security community.\n\ncheck it out: [https://github.com/who0xac/subhunterx](https://github.com/who0xac/subhunterx)",
+        "label": "HIGH"
+    },
+    {
+        "text": "yemeni hacker (rami sanaa) strikes with black kingdom: 1,500 u.s. systems hit via proxylogon exploit a yemeni hacker, rami sanaa, 36, has been formally charged with targeting more than 1,500 us systems, including schools, hospitals, and businesses, using the black kingdom ransomware (also known as pydomer).\n\nthe attack exploited the proxylogon vulnerability in microsoft exchange servers (cve-2021-26855), which enables an attacker to execute commands without authentication. it is often used in conjunction with another vulnerability (cve-2021-27065) to further enhance system access.",
+        "label": "HIGH"
+    },
+    {
+        "text": "co-op dragonforce cyber attack includes customer data, firm admits",
+        "label": "HIGH"
+    },
+    {
+        "text": "list of vendors compliance details: maintained most compliance companies are spending hours hunting down the same informations, soc 2 and iso 27001 certificates, subprocessor lists, baas, terms of service, and so on.  \n  \nto make that process easier,[\u00a0i\u2019ve started putting together a maintained, open-source database of vendor compliance details.](https://github.com/getprobo/probo/blob/main/packages/vendors/vendors.md) right now, the database includes:\n\n* links to vendor compliance certifications (soc 2, iso 27001, hipaa, etc.)\n* legal entity names and headquarters addresses\n* subprocessor list urls (which are often buried)\n* baa availability indicators\n* security/trust center pages\n\nthis is an early version, lots of vendors are still missing, but i\u2019m planning to keep expanding and improving it.   \n  \nif you find it useful or have ideas on what would make it better, i\u2019d love your feedback.",
+        "label": "HIGH"
+    },
+    {
+        "text": "new ddos attack vector in layer 7 ddos attacks targeting layer 7 of osi model (web applications) are difficult to detect and protect. in many cases attackers use legitimate traffic that makes it difficult to address these kind of attacks. \n- do you have any real life recent attacks where theis kind of attack vector has been used lately ? any articles to share hacker news maybe ? \n- what type of attacks are most known and used by attackers ? \n- do you know what is the state of the art currently for protecting against this ? any resources to share ?\n\nthanks !",
+        "label": "HIGH"
+    },
+    {
+        "text": "known exploited vulnerabilities intel - kevintel just released kevintel. a list of kevs curated from many sources, enriched with various data.\n\nsources:\n\n* 50+ rss sources, which includes vendor sites, news, exploit databases, etc.\n* cve mitre database\n* cisa\n* the shadowserver (via circl)\n* custom honeypot rules (still waiting for hits!)\n* ...\n\nenrichment:\n\n* nvd\n* scanner intergrations, nuclei, metasploit, etc.\n* online mentions (from the 50+ rss sources)\n* potential pocs from github\n* epss\n* ...\n\ni have set up a couple honeypots with custom rules to try and catch some kevs myself. the idea is to eventually be able to contribute my own kev detections to this list by increasing the number of honeypots in different global locations, and add more detection rules from the data collected. but need more funds to be able to scale this!\n\nmore features and data point coming in the next few weeks.",
+        "label": "HIGH"
+    },
+    {
+        "text": "owasp eu 2025 has anyone here attended a past owasp eu event? what was it like and is anyone going to barcelona this year? \n\nis it similar to defcon in the states? or vendor overload similar to infosec europe? without revealing too much, i\u2019m a hands on security architect with a direct reports within the professional services area.\n\ni am planning on attending but wanted to see if it\u2019s worth it before my company approves the cost. \n\nif others are going, i\u2019m not against meeting up to make professional connections.",
+        "label": "HIGH"
+    },
+    {
+        "text": "what are some of best sources for security updates? as title suggests, can you guys tell me some sources where we could reliable information.\ni want to keep myself updated regularly like major attacks happenings, vulnerabilities etc.",
+        "label": "HIGH"
+    },
+    {
+        "text": "co-op food supermarket chain hit by disruptive cyberattack in a statement shared with our newsroom, a co-op spokesperson confirmed that the company \u201crecently experienced attempts to gain unauthorized access\u201d to its systems. in response, it implemented unspecified safeguards to protect its infrastructure, which resulted in a \u201csmall impact\u201d on certain internal services, including call center operations. the spokesperson emphasized that there is no current need for customers or members to take any action and assured the public that efforts to minimize disruption are ongoing.",
+        "label": "HIGH"
+    },
+    {
+        "text": "zero day: apple this is big!\n\n\nwormable zero-click remote code execution (rce) in airplay protocol puts apple &amp; iot devices at risk\n\n[https://www.oligo.security/blog/airborne](https://www.oligo.security/blog/airborne)",
+        "label": "HIGH"
+    },
+    {
+        "text": "that time github got hit with a mass assignment attack in march 2012, github faced a significant security incident involving a mass-assignment vulnerability. this vulnerability arose due to insufficient validation of incoming form parameters, enabling unauthorized administrative privileges. as a result, github accounts were compromised.",
+        "label": "HIGH"
+    },
+    {
+        "text": "name of a law (law like murphy's, not actual) this is doing my head in. i recall a law for security administration, but not its name / to whom it is attributed. hoping someone here has come across it before and can jog my memory!\n\nit went thusly (or words to this effect):\n\n\"if you are accountable for the security of a system, but lack the authority to enforce it, your role is to take the blame when something goes wrong. update your cv accordingly.\"",
+        "label": "HIGH"
+    },
+    {
+        "text": "building zero trust architecture with open-source security solutions (20 tools to consider)",
+        "label": "HIGH"
+    },
+    {
+        "text": "hey! check this out. i have created a python-based benchmarking framework to evaluate the performance and memory overhead of common exploit mitigation techniques\u2014aslr, dep, and cfi\u2014across different environment profiles.\n\nthis tool provides a systematic framework for evaluating the performance impact of modern security mitigations (aslr, dep, cfi) across heterogeneous computing environments. designed for cybersecurity professionals, system architects, and devops teams, it enables quantitative analysis of security-performance tradeoffs through statistically rigorous benchmarking. the solution addresses critical industry needs for data-driven security configuration decisions in contexts ranging from embedded systems to cloud infrastructure.\n\npls feel free to provide any feedback and changes required.\n\nhttps://github.com/adityapatil37/mitigation-performance-tradeoff",
+        "label": "HIGH"
+    },
+    {
+        "text": "i built omnichron \u2013 a typescript library that unifies multiple web archive providers (wayback machine, archive.ph, common crawl, etc.) hey everyone\\~ \ud83d\udc4b  \ni recently published an open-source library called [`omnichron`](https://github.com/oritwoen/omnichron), which provides a unified interface to query archived snapshots of websites from multiple web archive providers.\n\n\u2728 **what it supports:**\n\n* internet archive (wayback machine)\n* archive.ph (archive.today)\n* common crawl\n* [perma.cc](http://perma.cc)\n* uk web archive \u2026 and it\u2019s super easy to extend!\n\n\ud83d\udee0\ufe0f features:\n\n* typescript-first, tree-shakable\n* unified snapshot result format\n* easily fetch and analyze historical versions of a domain (great for osint, bug bounty, recon)\n* pluggable providers with caching support\n\n  \n\ud83d\udd17 github: [https://github.com/oritwoen/omnichron](https://github.com/oritwoen/omnichron)\n\nwould love feedback, and feel free to star it if you find it useful! \ud83d\udc96",
+        "label": "HIGH"
+    },
+    {
+        "text": "why can't devs just write invulnerable software ? i am an infosec newbie and only know a few keywords here and there about software exploits, such buffer overflows. let's say that some software is vulnerable because it relies on some (insecure?) mvcrt function like printf, instead of printf\\_s, why can't it just be written in printf\\_s?\n\nfor any insecure function that allows overflow, chances are there is a more secure function available. so how are vulnerabilities even a thing (i just gave overflows as an example), now that we can automate pretty much everything, just scan for the vulnerable function and replace it with a secure one.\n\nto put it differently, do devs knowingly use functions or routines that are known to have security issues? or maybe they simply don't have a choice ?",
+        "label": "HIGH"
+    },
+    {
+        "text": "cross-site websocket hijacking exploitation in 2025 hey everyone, we published a new blog post today focusing on the current state of cross-site websocket hijacking! our latest blog post covers how modern browser security features do (or don't) protect users from this often-overlooked vulnerability class. we discuss total cookie protection in firefox, private network access in chrome, and review the samesite attribute's role in cswh attacks. the post includes a few brief case studies based on situations encountered during real world testing, in addition to a simple test site that can be hosted by readers to explore each of the vulnerability conditions.\n\n[https://blog.includesecurity.com/2025/04/cross-site-websocket-hijacking-exploitation-in-2025/](https://blog.includesecurity.com/2025/04/cross-site-websocket-hijacking-exploitation-in-2025/)",
+        "label": "HIGH"
+    },
+    {
+        "text": "tarantula - open source agentic web app hacker poc [tarantula](https://github.com/trivulzianus/tarantula) is the culmination of hundreds of dev hours i did in spare time. it is a proof of concept of how a web app hacking tool powered by llms could look like.\n\nit has successfully solved multiple portswigger labs. i thought about monetizing it somehow, but i actually prefer open sourcing my projects for the community to play with and improve themselves.\n\ntruthfully, between my work and degree, i don't have much time to take it any farther than it is right now. i leave it in your capable hands.\n\nhappy (legal) hacking!",
+        "label": "HIGH"
+    },
+    {
+        "text": "is it still possible to hack the admin page on a modern router? from what i've read, modern routers use \"rate limiting\" to protect themselves from brute force password attacks. after a set number of failed logins, that particular device is blocked from further attempts.\n\nare modern hacking tools able to circumvent this, or does rate limiting make them useless? it would make sense that somebody had gotten around this by continuously changing the mac address.\n\ni'm aware of tools like hydra, but i can't find anything mentioned about it how it gets past rate limiting.\n\nthank you.",
+        "label": "HIGH"
+    },
+    {
+        "text": "honeypot brute force analysis \n81,000+ brute force attacks in 24 hours. but the \"successful\" logins? not what they seemed.\n\ni set up a honeypot, exposed it to the internet, and watched the brute-force flood begin. then something unexpected - security logs showed successful logins, but packet analysis told a different story: anonymous ntlm authentication attempts. no credentials, no real access - just misclassified log events.\n\neven more interesting? one ip traced back to a french cybersecurity company. ethical testing or unauthorized access?\nfull breakdown here: https://kristenkadach.com/posts/honeypot/",
+        "label": "HIGH"
+    },
+    {
+        "text": "unauthorised fex.net file downloads (open source tool)",
+        "label": "HIGH"
+    },
+    {
+        "text": "ransomware gang creates tool to automate vpn brute-force attacks",
+        "label": "HIGH"
+    },
+    {
+        "text": "memory corruption in delphi hi folks, we've written a post on how memory corruption vulnerabilities could be introduced in delphi code despite it generally being considered \"memory safe\" by a few sources. we cover how compiler flags and dangerous system library routines could affect memory safety while demonstrating delphi stack/heap-based overflow examples and conclude with a few tips for developers to avoid introducing memory vulnerabilities in their delphi code.\n\n[https://blog.includesecurity.com/2025/03/memory-corruption-in-delphi/](https://blog.includesecurity.com/2025/03/memory-corruption-in-delphi/)",
+        "label": "HIGH"
+    },
+    {
+        "text": "ray ban meta ai glasses, is it exploitable? (in the sense of client side customization) curious to know what i can do with my glasses. i\u2019m being told the source code for the meta ray ban ai glasses is open source as well.",
+        "label": "HIGH"
+    },
+    {
+        "text": "researchers find new exploit bypassing patched nvidia container toolkit vulnerability",
+        "label": "HIGH"
+    },
+    {
+        "text": "ghosting-amsi \ud83d\udee1 amsi bypass via rpc hijack (ndrclientcall3) this technique exploits the com-level mechanics amsi uses when delegating scan requests to antivirus (av) providers through rpc. by hooking into the ndrclientcall3 function\u2014used internally by the rpc runtime to marshal and dispatch function calls\u2014we intercept amsi scan requests before they're serialized and sent to the av engine.",
+        "label": "HIGH"
+    },
+    {
+        "text": "from memory corruption to rce exploiting a memory corruption vulnerability in an arm binary to execute arbitrary code on a remote system",
+        "label": "HIGH"
+    },
+    {
+        "text": "poc - remote and unauthenticated attacker can send crafted http requests to execute arbitrary code - cve-2025-3248",
+        "label": "HIGH"
+    },
+    {
+        "text": "poc - cve-2025-29306 foxcms /images/index.html code execution vulnerability",
+        "label": "HIGH"
+    },
+    {
+        "text": "rce in telegram desktop if you accept the call new telegram desktop rce poc for accepting any calli reported it to @telegram security and not resolved yet and don't worry for it, it won't launch the full rce only in specific case and not worked 100%. poc: [https://youtu.be/107yuro51qs?si=glnflbb-oh\\_loswo](https://youtu.be/107yuro51qs?si=glnflbb-oh_loswo)  \n  \nfor more details:   \ncontact: u/engacker  \n  \nonly poc for red team operators and ethical hacking\n\nhttps://preview.redd.it/st3ryzq99jue1.png?width=1364&amp;format=png&amp;auto=webp&amp;s=2d6ab22d2ab24224c0e327bad190a4e6aaf01e8e",
+        "label": "HIGH"
+    },
+    {
+        "text": "telegram not respond to a serious vulnerability in their desktop app hello all,\n\nas usual i'm doing a security research on desktop apps and i noticed telegram has a serious vulnerability in their desktop app that i can get rce from their desktop app and they didn't respond to my email????\n\nshould i publish it to the public!!!\nbut it's a critical vulnerability and apts can use it in a dangerous situation.\n\nwhat should i do?",
+        "label": "HIGH"
+    },
+    {
+        "text": "accidentally installed the phoenix deb package from exploit education on my main machine. did this put my pc at risk? i just started following liveoverflow's binary exploitation tutorials and he was using protostar which got replaced with phoenix. instead of installing it on my guest vm machine i accidentally installed that package on my main. did this expose my host to the public and puts it at risk? i checked the source files from their github and there seems to only be vulnerable executables meant to be exploited, meaning that the worst that can happen is only if someone already has remote access to my machine for post exploitation stuff.\n\ni'm still new and i may be missing something, i removed the package later but i would still like to know for sure if that was enough to make my main machine easily exploitable.",
+        "label": "HIGH"
+    },
+    {
+        "text": "accidentally installed phoenix from exploit education on my main machine. did that put my pc at risk? i was trying to follow liveoverflow's tutorials on binary exploitation and he was using protostar. but since it got replaced with phoenix i downloaded their deb package on my host machine thinking i was on my vmware guest and accidentally installed it here from [https://exploit.education/downloads](https://exploit.education/downloads) \n\nlooking at the source files there only seem to be vulnerable executables meant to be exploited, but it doesn't look like it opens any port or runs any service. since i'm new to this i may be missing something. is it correct to assume that this doesn't somehow expose my host to the public and does not make my machine more vulnerable except for post-exploitation stuff, since the point of those exercises is just to exploit the executables themselves?",
+        "label": "HIGH"
+    },
+    {
+        "text": "open source implementation for google\u2019s project naptime - offensive security with llms",
+        "label": "HIGH"
+    },
+    {
+        "text": "difficulty traversing source code so, i have started to navigate a large code base. it's a huge code base and a legacy one. i have kind of created a threat-model as to where the high-priority and remote facing code lies. but i am having issue traversing.\n\n  \nissue as in the code is c and c++. example -- there are pointers to structures, inside which there is another structure as a field, and again inside that field there's a structure. this feels quite convoluted and hard to follow.\n\n  \nany tips you have that can make it easier. i am not too experienced in traversing huge and legacy codebases. suggestions are appreciated.",
+        "label": "HIGH"
+    },
+    {
+        "text": "best cons what are the absolutely best cons in the world for exploit dev and vulnerability research? \n\nthanks all",
+        "label": "HIGH"
+    },
+    {
+        "text": "legal restrains of vulnerability research and exploit development in the eu. good day fellow redditers,\n\n  \ni am looking to start finding zero-days and developing exploits for them here in the netherlands. i am, however, wandering what the legal constraints are in regard to the finding of vulnerabilities, creating exploits for them, and lastly selling these exploits and zero-days. to put it in other words: what are my options whilst staying within legal boundaries for the eu, specifically the netherlands, and laws outside the eu might be relevant too. i am having a hard time figuring this out, i am also not educated in the law what-so-ever. in case relevant: i am 16 and i don't currently work for any company.\n\n  \nthank you very much in advance!\n\n  \nkind regards,\n\nme",
+        "label": "HIGH"
+    },
+    {
+        "text": "moving from ctfs to real-world exploit development how do you transition from ctfs to actual exploit development? i have a decent understanding of reverse engineering, but so far, i\u2019ve only applied it in ctf challenges. i\u2019m not sure where to start\u2014do i just load up the windows kernel or `ntdll.dll` in ida and hope to find a vulnerability? it feels much harder because, in ctfs, you\u2019re guaranteed that there\u2019s something exploitable, whereas in the real world, you might end up searching for nothing.",
+        "label": "HIGH"
+    },
+    {
+        "text": "help me hack chrome hello i come from pentesting background, want to do exploit dev.\nhave set goal to find rce on google pixel 9, realized i dont have a device in my country. so went to linux kernel, but found dificult finding anyone that was paying for a rce or priv esc exploit on linux, so started studying chromium source code, thinking that if i find a rce in there i would get 300k, but reliazed that google chrome and chromium are not the same and i will have to reverse engineer chrome's security features to get a rce on chrome working. \n\nstudying source code, identifying possible vulnerabilties is something, but revese engineering chrome?\n\nor maybe this is my imagination. will i have to realy do this?\n\nwould't be better target to reverse engineer drivers on my samsung phone and find a rce on that and get one million instead  just 300k on chrome?",
+        "label": "HIGH"
+    },
+    {
+        "text": "starting out with mips architecture exploit development  hi everyone i am currently in the field of cyber security specializing in malware development. i am now considering moving into exploit development, according to my research targeting the formidable x86, x64 , arm architecture is a tough task as i am an independent researcher and don\u2019t have the required funding. so i am opting to start out with exploit development targeting the mips architecture as its know to be full of vulnerabilities and has exploit mitigation turned off by default. i would to know whether my approach is a valid path to follow. thank you.",
+        "label": "HIGH"
+    },
+    {
+        "text": "i absolutely love this i fear for a lack of jobs in it. what other security fields benefit from it? i love exploits, reading about them, studying them, even malware analysis and all.\n\nthe thing is, i'm still a beginner, i don't come from a developed country and if i'm to do so i want a skill that i'll probably get a job in. i'm good at software development with some real work experience with it but that's a challenge to get a job in nowadays too.\n\ni'm delusional to want the best of both worlds, studying exploits and being able to have a job that benefits from my exploit development hobby.\n\ni've thought about studying app security alongside exploit dev, reverse engineering too seems like an advanced field with little entry level jobs.\n\nthanks for reading.",
+        "label": "HIGH"
+    },
+    {
+        "text": "part 3: exploiting a squirrel engine sbx 1day  hi again :d this is the third part of my lil vr journal.\nin this one, we are getting an arbitrary read by leveraging the type confusion/oob bug.\n\npart 3: https://youtu.be/dkxpnwuk0q4\n\nprevious episodes:\n&gt;part 1: https://www.reddit.com/r/exploitdev/comments/1gaf5go/exploiting_a_squirrel_engine_sandbox_escape_1day/\n&gt;part 2: https://www.reddit.com/r/exploitdev/comments/1gh90iy/part_2_exploiting_a_squirrel_engine_sandbox/\n\ni hope you found it informative.",
+        "label": "HIGH"
+    },
+    {
+        "text": "getting started with linux-based jailbreaking from an intermediate/advanced programming/hacking skill level? i know c/x86_64 asm, and have a good grasp on stuff like double free/use after free, bof (and rop), race conditions, and a fairly good understanding of basic sandboxing like chroot and seccomp, and i'm also about halfway through the blue belt modules on pwn.college. i've tried poking around with the jailbreak exploit i used on my school chromeos laptop (sh1mmer/e-halcyon) but everything being done seemed completely arcane and i got pretty lost almost immediately. what are some good hands-on resources, ctf challenges/writeups, etc. to get started for my skill level?",
+        "label": "HIGH"
+    },
+    {
+        "text": "looking for help on dma captain dma 75t is trash i recently purchased a dma from dma kingdom and i have had nothing but issues the 75t is garbage and isn\u2019t compatible with any firmware i have found as of yet can anyone help me with the right fw or point me in the direction of a better source to purchase real dmas no bs",
+        "label": "HIGH"
+    },
+    {
+        "text": "ios vr resources? can someone share some resources on ios vulnerability research please? it doesn't have to be free",
+        "label": "HIGH"
+    },
+    {
+        "text": "house of mind poc anyone have a working poc using house of mind for heap exploitation (vanilla or fastbin variant) that actually pops a shell?\n\nin a program i'm testing i can modify the arena bit but due to application logic it's unclear how exploitable it is.",
+        "label": "HIGH"
+    },
+    {
+        "text": "using gpt to find a \"zero-day\" vulnerability...",
+        "label": "HIGH"
+    },
+    {
+        "text": "what\u2019s your approach to discovering logic flaws in high-level code that lead to zero-day vulnerabilities, particularly in web applications or cloud environments? what\u2019s your approach to discovering logic flaws in high-level code that can lead to zero-day vulnerabilities, particularly in web applications or cloud environments? specifically, what methodologies do you employ for identifying these flaws during the code review process? are there particular tools or frameworks you find effective in uncovering such vulnerabilities?",
+        "label": "HIGH"
+    },
+    {
+        "text": "cve-2024\u201323897 \u2014 jenkins file read vulnerability \u2014 poc",
+        "label": "HIGH"
+    },
+    {
+        "text": "decidingonasubsystem: how do experienced linux vulnerability researchers and exploit developers normally decide on which kernel subsystem interests them enough to attack? i find that this is also true of browser exploitation, but i am more familiar with kernel architecture.",
+        "label": "HIGH"
+    },
+    {
+        "text": "linux kernel privilege escalation techniques  guys ever heard of pgd hopping &amp; patching cred struct (in linux) for privilege escalation? im trying to implement those techniques but i didnt find much resources, afaik theyre linux kernel heap exploitation techniques but idk much about them but both of em modifies the cred struct to get a pe, and also if you got any other techniques share it, it will be appreciated!",
+        "label": "HIGH"
+    },
+    {
+        "text": "new to exploit dev and programming.  i\u2019m very interested in vulnerability research and finding bugs. for example. i\u2019ve always wanted to find lpe bugs and rce bugs in software such as zoom, steam, etc.\n\nbut i\u2019m so interested in finding critical bugs in web apps as well. for example i really want to do research on electron apps.\n\nso i was wondering how i would go about this with 0knowledge in programming or hacking",
+        "label": "HIGH"
+    },
+    {
+        "text": "is it legal to sell exploits on zerodium i am a new to this and would like to know if i participate in a bug bounty or hack on the listed products do i need permission from the company before hand.",
+        "label": "HIGH"
+    },
+    {
+        "text": "looking for resources for ios exploit dev hey like the title says, i am looking for ios exploit dev materials. i have experience doing linux but not familiar with phones and not sure where to start. i know some conferences are doing like training for thousands but i can't afford something above hundreds range. thank you!",
+        "label": "HIGH"
+    },
+    {
+        "text": "my own materials for beginners towards linux kernel exploitation, including ctf&amp;cve environments and some papers. open source at\u00a0[https://github.com/arttnba3/linux-kernel-exploitation/tree/main/ctf](https://github.com/arttnba3/linux-kernel-exploitation/tree/main/ctf)\u00a0with attachments. i hope this could be helpful for you if you're a beginner at pwning the linux kernel : )",
+        "label": "HIGH"
+    },
+    {
+        "text": "finding outdated software hey whoever reading this. \n\ni got my hands on offsec exploit dev material (osed) and want to follow along. i heard its a really good foundation for rev eng and exploit dev. the material looks fun .\n\n problem is , it uses some really outdated software that i can't seem to find anywhere , not on the publishers site , not github , even looked on the wayback machine ...\n\nany sources for this kind of outdated vulnerable software ? would really appreciate ))",
+        "label": "HIGH"
+    },
+    {
+        "text": "how do 0-day researchers find bugs without access to symbols (pdb) files?  everyday cves are awarded to security researchers for closed projects that do not have public symbols files available (ex: vmware esxi, cisco routers, etc). but how do they analyze binaries without symbols files? for microsoft bug bounty programs, you have access to symbols files that help with analysis of a binary. but for these closed source projects, it should be next to impossible to find what the functions are right?",
+        "label": "HIGH"
+    },
+    {
+        "text": "hardware requirements for ios exploit research? not sure if this is the right subreddit. but i am curious on becoming an ios exploit/vulnerability researcher. i am just wondering, would it be possible to do this on linux or does one need to use a mac to do this type of work? \n\nideally i would largely prefer linux due to the popular tools being built for it. but i'd love to hear any tips from someone on the hardware requirements.\n\n  \ni'd appreciate any sort of answers! :)",
+        "label": "HIGH"
+    },
+    {
+        "text": "examples of exploiting unsafe signal handlers (cwe-479) a program i'm testing has a null dereference bug which transfers control to a segv handler. the handler then does some logging (including stack info from the glibc back trace functions).\n\nthe null dereference doesn't by itself seem exploitable but from reading references like to cwe-479 it may be possible to use the logging code to corrupt memory, perhaps if there's a way to use multiple signals? has anyone got any working examples of exploits that use this approach? there are a few online but they're all old.",
+        "label": "HIGH"
+    },
+    {
+        "text": "can you redirect code execution with a single heap overflow in glibc 2.39? i'm trying to understand the impact of this vulnerability i reported and i'm trying to see if it is exploitable. \n\nassume the following program:\n\n```\nptr1 = malloc(8000)\n\nptr2 = malloc(14k)\nptr3 = malloc(14k)\n\nmemcpy(ptr1, buffer_in, size); // overflow\n\nfree(ptr2)\nfree(ptr3)\n\nfree(ptr1)\n```\n\nthis vulnerable code runs in a thread. meaning its arena is not the main arena where all the juicy pointers are at - so i'm left with a pretty much blank heap, and the only thing i can do is to being writing `ptr1` and overflow `ptr2` and `ptr3`.\n\ni started to dive back again into malloc internals (haven't done so since 2015) but i thought that before i do that i'd ask - \n\ncan this work in glibc 2.39? or am i wasting my time?\n\nthanks",
+        "label": "HIGH"
+    },
+    {
+        "text": "help...... hi everyone hope you all are doing well. does anyone has the source for sec 760 or sec 660 free pdf. so it will be very helpful for me to study more about stack and heap in a very detailed more and the attacks related to it.\nthanks",
+        "label": "HIGH"
+    },
+    {
+        "text": "poc \u2014 cve-2024\u20134956 -unauthenticated path traversal",
+        "label": "HIGH"
+    },
+    {
+        "text": "zero day hunting specialization i already done all of the fundamentals in finding zero days like sharpening my python, c, assembly, vulnerability research, shellcoding, reverse engineering and binary exploitation skills.\n  \nnow i am confused what to choose, maybe you have some suggestion based on some experienced people in here? \nhere are the specializations i am seeing in the wild:\n- browsers\n- hypervisors\n- embedded\n- .net\n- kernel\n- android/ios\n- etc.\n  \nmaybe you have some experience regarding those specializations, what do you think is a good start to specialize and what could be the good specialization in this era to gain more 0-days (and money hehe)",
+        "label": "HIGH"
+    },
+    {
+        "text": "cve-2016-6187 lpe i am rather new to kernel exploitation, so i have decided to develop an exploit for an older cve. i went with cve-2016-6187, and this is the result [https://github.com/milo-d/cve-2016-6187\\_lpe/](https://github.com/milo-d/cve-2016-6187_lpe/)\n\n  \ndespite it being a poc for an old cve, i still hope that it contains helpful takeaways, such as using the rfkill\\_data object to leak kernel text. and if not, then that's fine too - i had my fun :)",
+        "label": "HIGH"
+    },
+    {
+        "text": "i found a new type of web vulnerability: rpfi one of the issues with finding bugs is that so many other people are using automated tools to find the same bugs. well, i have found a new type of vulnerability that almost no one is looking for yet which means there is a good chance you all can find it. you would have to really understand relative path overwrite and be prepared to make a case with these companies as no one will no what it is yet. the new technique is called relative path file injection. here is my blog. both gareth and james from portswigger shared it to their followers on linkedin. feel free to go verify that. leave  comments on the blog if you need help with something but i do tend to be pretty busy. i will add a github repo at some point to help people better understand it. happy hunting.",
+        "label": "HIGH"
+    },
+    {
+        "text": "need help to demonstrate buffer overflow using a calculator   i would like to demonstrate a buffer overflow attack by manipulating the inputs in a simple calculator program. the program has functions for addition, subtraction, division, and multiplication, and it takes one operator input using the vulnerable `gets()` function. \n\nwhat i aim to demonstrate is that when the calculator tries to add, it misbehaves and performs multiplication instead due to the buffer overflow. i've tried several methods to overflow the buffer and rewrite the return address when inputting the operator to change the function's address to multiply, but i want the calculator to behave as i described. please help me achieve this.",
+        "label": "HIGH"
+    },
+    {
+        "text": "ret2shellcode hello, i've been struggling to exploit a ret2shellcode bug. i am on a m3 mac with an emulated x64 ubuntu, but the exploit i wrote cant spawn a shell. i can see the commands running in gdb but without gdb it just outputs segfault, please help me, thank you.\n\nlink to binary: [https://github.com/ctf-wiki/ctf-challenges/raw/master/pwn/stackoverflow/ret2shellcode/ret2shellcode-example/ret2shellcode](https://github.com/ctf-wiki/ctf-challenges/raw/master/pwn/stackoverflow/ret2shellcode/ret2shellcode-example/ret2shellcode)\n\nthis is my script\n\n    from pwn import *\n    \n    io=process(\"./ret2shellcode\")\n    \n    print(io.recv())\n    payload=\"a\"*112\n    payload+=p32(0xffffd360)\n    payload+=asm(shellcraft.sh())\n    io.sendline(payload)\n    io.interactive()",
+        "label": "HIGH"
+    },
+    {
+        "text": "the future of exploit dev hi everyone, recently i have been taking a look at vulnerability research and how advanced some techniques are becoming along with the difficulties of such attacks.\n\n i was wondering what people\u2019s thoughts are on the future of security research and exploitation as while it\u2019s a cat and mouse game the attack surface seems to be getting thinner and thinner over time. with mem safe languages and technologies like cet just what will the future look like in this space. \n\ni\u2019m wanting to go into this field as i\u2019m curious by nature and have a knack for breaking things but it worries me for the future. as a note, i am not expecting this to be obsolete as with new technologies there\u2019s always going to be issues however, the thoughts on jobs is a concern. \n\nthanks,",
+        "label": "HIGH"
+    },
+    {
+        "text": "joining a browser rce research team + lpe how do i go about joining an exploit chain team that is dedicated to browsers while i focus on operating systems for a lpe? i am much more knowledgeable about operating systems than jit compilers or html renders, and realistically could only be able to create a production grade browser attack by collaborating with a browser researcher, and instead focusing on the operating system.",
+        "label": "HIGH"
+    },
+    {
+        "text": "exploit help  hi guys i need help regarding the exploit of cve-2021-1675 print nightmare , i do everything properly from configuring the smb server , setting up the listener , everything works except the last step in which i have to run the exploit im met with a rprn sessionerror , unknown error code 0x180 pls help me troubleshoot this , my kali machine is my attacker and windows 2019 server machine is my target",
+        "label": "HIGH"
+    },
+    {
+        "text": "return oriented programming buffer overflow exploitation part 1 - in lab exercise",
+        "label": "HIGH"
+    },
+    {
+        "text": "exploit acquisition program!! do you have a working ?  \n\n\n1. *0day exploit ?*\n2. *latest av bypass techniques and av exploits ?*\n3. *edr bypass techniques ?*\n4. *driver* exploits ? \n\nwe acquire them just reach out to the mail [afljack@proton.me](mailto:afljack@proton.me) with basic description and with working video **poc** of the exploit along with your asking price.",
+        "label": "HIGH"
+    },
+    {
+        "text": "drag and pwnd: exploiting vs code with ascii",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "poc for cve-2025-2011 - sqli in wordpress depicter plugin &lt;= 3.6.1",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "shuffling the greatest hits: how dragonforce ransomware samples lockbit and conti into a ransomware jukebox",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "aitm for whfb persistence we recently ran an internal entraidiots ctf\u00a0where players had to phish a user, register a device, grab a prt, and use that to enroll windows hello for business\u2014because the only way to access the flag site was via phishing-resistant mfa.   \n  \nthe catch? to make whfb registration work, the victim must have performed mfa in the last 10 [minutes.in](http://minutes.in) our ctf, we solved this by forcing mfa during device code flow authentication. but that\u2019s not something you can do in a real-life red team scenario.  \n  \nso we asked ourselves: how can we force a user we do not controlll to always perform mfa? that\u2019s exactly what this blog explores.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "i tried out vibe hacking with cursor. it kinda worked and i ultimately found rce.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "a look into the secrets of mcp: the new secret leak source",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "airborne: wormable zero-click rce in apple airplay puts billions of devices at risk",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "fuzzing windows arm64 closed-source binary with qbdi and libfuzzer",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "introducing hanalyzer: an open-source tool to secure your hana databases - anvil secure",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "a validator architecture apple could ship today to eliminate media exploits",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "cve-2021-25646 is actively exploited to deploy crypto miners",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "uncovering a 0-click rce in the supernote nomad e-ink tablet",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "trox stealer: a deep dive into a new malware as a service (maas) attack campaign https://sublime.security/blog/trox-stealer-a-deep-dive-into-a-new-malware-as-a-service-maas-attack-campaign",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "meta unveils llama 4: a game-changer in open-source ai",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "open-source automated penetration testing reporting system",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "critical pgadmin vulnerability let attackers execute remote code",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "whatsapp vulnerability let attackers execute malicious code via attachments",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "cyberalerts known exploited vulnerabilities (kev) catalog",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "serviceradar 1.0.28 - open source network monitoring and observability serviceradar is an open source distributed network monitoring tool that sits in-between solarwinds and nagios in terms of ease-of-use and functionality. we're built from the ground up to be secure, cloud-native, and support zero-trust configurations and run on the edge or in constrained environments, if necessary. we're working towards zero-touch configuration for new installations and a secure-by-default configuration. lots of new features including integrations with netbox and armis, support for rust, and a brand new checker based on iperf3-based bandwidth measurements. check out the release notes at\u00a0[https://github.com/carverauto/serviceradar/releases/tag/1.0.28](https://github.com/carverauto/serviceradar/releases/tag/1.0.28)\u00a0theres also a live demo system at\u00a0[https://demo.serviceradar.cloud/](https://demo.serviceradar.cloud/)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "talk to your malware - integrating ai capability in an open-source c2 agent",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "intercepting macos xpc",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "this framework doesn\u2019t hide files. it erases their existence until reassembly. i wrote about a proof-of-concept called veriduct - a system that fragments files into meaningless chunks with no metadata or order. nothing exists until a key map is used to reconstruct it.\n\t\u2022\tantivirus can\u2019t scan it.\n\t\u2022\tforensics can\u2019t recover it.\n\t\u2022\teven full backups are useless without the map.\n\nit can be weaponized. or it can protect those who live under threat. either way, it forces a rethink of what detection actually means.\n\nrepo: https://github.com/reapermunky/veriduct",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "xss to rce by abusing custom file handlers - kentico xperience cms (cve-2025-2748) - watchtowr labs",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "anatomy of an llm rce",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "chrome exploit in the wild: cve-2025-2783 in operation forumtroll apt",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "critical security flaws in fips/common criteria certified enterprise network switches",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "botb \u2013 all-in-one folder renamer, credential extractor &amp; base64 processor (open source)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "powershell-based cve scanner using nmap + vulners (open source + auto-setup)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "by executive order, we are banning blacklists - domain-level rce in veeam backup &amp; replication (cve-2025-23120) - watchtowr labs",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "arbitrary file write cve-2024-0402 in gitlab (exploit)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "[tool] truffleshow: a client-side web viewer for trufflehog outputs i made truffleshow (https://truffleshow.dev), a free and open-source web-based visualization tool for trufflehog json outputs. key features:\n\n* 100% client-side processing - no server, no data storage\n* easy-to-use interface for analyzing trufflehog findings\n* simple json file upload functionality\n* clear visualization of findings, including verification status\n* sorting by verification status and date\n* built with alpine.js and tailwind css\n\nthe tool is completely free, open-source, and runs entirely in your browser.\n\ngithub: [https://github.com/alioguzhan/truffleshow](https://github.com/alioguzhan/truffleshow)\n\nfeedback and contributions welcome!",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "brushing up on hardware hacking part 2 - spi, uart, pulseview, and flashrom hey all! ive been publishing some introductory resources for getting into hardware reverse engineering for a while now. just wanted to share with the community",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "cradle.sh open source threat intelligence hub batteries included collaborative knowledge management solution for threat intelligence researchers.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "emba - the open source firmware analyzer version 1.5.2 - \"sbom - the next generation\" is available",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "analysis of cve-2025-24813 apache tomcat path equivalence rce",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "apache camel cve-2025-27636 poc",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "hey, everybody. i recorded a video on the topic of network security. this is a study about detecting attacks on active directory using suricata ids. deep packet analysis, byte sequences and signature writing.\nenglish subtitles are included.\n\nhave fun watching it!",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "\"uquix v1.0: automate burp repeater's tedious workflows - auto-generate 1000+ complex header/payload combos per target &amp; auto-uncover hidden vulns [open-source] \ud83d\udd13\ud83d\ude80\"",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "new method to leverage unsafe reflection and deserialisation to rce on rails",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "!exploitable episode two - enter the matrix. sshd exploit used by trinity in the movie the matrix reloaded",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "techlore video review of buskill (open-source dead man switch) \ud83d\udd12",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "hacking the xbox 360 hypervisor part 2: the bad update exploit",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "xss for seo - cnn and many others are exploited!",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "car hacking, doggie style:  diy open-source can bus - usb adapter",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "how i went from jerking off to uncovering hundreds of exploited xss vulnerabilities \ud83d\udea8",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "how i went from *** to uncovering hundreds of exploited xss vulnerabilities",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "360xss: mass website exploitation via virtual tour framework for seo poisoning",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "ransacked: over 100 security flaws found in lte/5g network implementations",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "achieving rce in famous japanese chat tool with an obsolete electron feature",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "microsoft outlook exploited by finaldraft malware for hidden communication",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "open source lists of proxy ip addresses used by bots, updated daily",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "curious case of ad cs esc15 vulnerable instance and its manual exploitation",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "whoami: a cloud image name confusion attack | datadog security labs",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "tenda ac15 cve-2020-13393 exploit (!exploitable episode one)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "ransomware groups exploiting microsoft teams",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "how attackers can bypass opa gatekeeper in kubernetes due to rego flaws",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "vulnerability in cisco webex connect by ophion security",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "rce (lan) in marvel rivals",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "rce in marvel rivals",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "cve-2024-49138 windows clfs heap-based buffer overflow analysis",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "new way to exploit byovd exploits with symbolic links.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "exploit windows winget.exe to execute malicious powershell scripts",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "cve-2024-50050: critical vulnerability in meta-llama/llama-stack | oligo security",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "poc for cve-2025-0282 published (ivanti connect secure stack bof)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "psirt | fortiguard labs - cve-2024-55591 exploited in the wild - report provides ioc",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "heap exploitation training",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "post exploitation reverse shell using websockets",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "gayfemboy: a botnet deliver through a four-faith industrial router 0-day exploit.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "exploiting ssti in a modern spring boot application (3.3.4)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "do secure-by-design pledges come with stickers? - ivanti connect secure rce (cve-2025-0282) - watchtowr labs",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "bypassing file upload restrictions to exploit client-side path traversal (cspt, cspt2csrf)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "syn spoof scanner - a simple tool to perform syn port scan with spoofed source ips for offensive deception",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "github - musana/cf-hero: cf-hero is a reconnaissance tool that uses multiple data sources to discover the origin ip addresses of cloudflare-protected web applications. the tool can also distinguish between domains that are protected by cloudflare and those that are not.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "from arbitrary file write to rce in restricted rails apps",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "release of naxsi v1.7 - open source web application firewall",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "entra id - bypass for conditional access policy requiring a compliant device (poc)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "i'm lovin' it: exploiting mcdonald's apis to hijack deliveries and order food for a penny",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "exploiting reflected input via the range header",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "how an obscure php footgun led to rce in craft cms",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "hubphish exploits hubspot tools to target 20,000 european users for credential theft",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "hacking kerio control via cve-2024-52875: from crlf injection to 1-click rce",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "the qualcomm dsp driver - unexpectedly excavating an exploit",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "cve-2024-0012 &amp; cve-2024-9474 (palo alto pan-os) exploit",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "exploiting device authentication vulns in cloud-managed iot devices",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "does bing have a buffer overflow?",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "cleo harmony, vltrader, and lexicom - rce via arbitrary file write (cve-2024-50623) - watchtowr labs",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "[info] how salt typhoon exploits vulnerabilities to stay ahead - wraven",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "trying to exploit my old android device, take 2 (cve-2020-0401, packagemanagerservice)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "u.s. officials urge americans to use encrypted apps amid cyberattack that exposed live phone calls",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "pentesting salesforce communities",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "mssql identified as vulnerable to emoji string exploitation",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "trying to exploit my old android device, take 1",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "help and feedback needed. can you exploit my loginform to find only 'xss' or 'sql' without changing code, because i tried my own code via virtual machine but i couldn't find 'xss' or 'sql' vulnerbility if you guy find it please let me know how did you do that, here github repo link.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "20-year-old macos vulnerability allows attackers to gain root access remotely",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "open source tool for observable investigation - need feedback",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "ruby 3.4 universal rce deserialization gadget chain / nastystereo.com",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "cyberbro: an open source alternative for cybergordon (custom api) - feedback needed",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "open-source powerhuntshares.v2 - find shares, extract passwords, and fingerprint with llm",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "google claims world first as ai finds 0-day security vulnerability",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "alleged syn-scans of known honeypots from spoofed source ips of tor nodes",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "methodology for leveraging llms for 0-day discovery (18+ vulns including on netflix, hulu, and salesforce)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "an open source version of cyberscarecrow (malware scarecrow for your pc)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "paranoids\u2019 vulnerability research: netiq imanager security alerts | paranoids | yahoo inc.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "a powerful tool for bluetooth security researchers and vulnerability testers!",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "ai code scanner finds 15+ critical zero-days",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "open-source ai tool for pii masking",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "chatgpt-4o guardrail jailbreak: hex encoding for writing cve exploits",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "0din blog - chatgpt-4o guardrail jailbreak: hex encoding for writing cve exploits",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "zero trust: how the \u2018jia tan\u2019 hack complicated open-source software",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "how it is possible to locate smartphones using advertising id without spyware or exploit",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "aws cdk risk: exploiting a missing s3 bucket allowed account takeover",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "[poc] sap note 3268959 - xss and url redirection vulnerabilities in sap netweaver as java",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "[poc] sap ping pong: xss and url redirection vulnerabilities",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "1-click exploit in south korea's biggest mobile chat app",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "a survey of deterministic approach rfc6979 for open source implementations: mbed-tls, gnutls and openssl",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "exploiting amd atdcm64a.sys arbitrary pointer dereference - part 3",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "ivanti connect secure - authenticated rce via openssl crlf injection (cve-2024-37404)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "exploiting visual studio via dump files - cve-2024-30052",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "survey of cups exploit attempts",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "when ai gets hijacked: exploiting hosted models for dark roleplaying",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "mfa on personal phones as it says, after all the headlines recently in the uk, we\u2019re looking to harden our posture a bit more. mgmt want to force everyone into app-based mfa - moving away from sms. most of our employees don\u2019t have work phones, so we\u2019d be mandating them to download and use an authentication app of choice - not bothered if it\u2019s microsoft or google or authy or whatever\u2026. can we do this?! legally?! (ignoring completely the implications on the culture - seriously, please ignore it. i know it matters, i can\u2019t do anything about it - i\u2019ve tried, i\u2019m not winning this battle\ud83d\udc80)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "what's your approach to log normalization? curious how you are all handling log normalization\n\n* are you using your siem\u2019s native normalization (e.g., splunk\u2019s cim, elastic ecs, panther\u2019s schema), an open source format like ocsf, or something custom and internal?\n* do you preprocess logs outside the siem (e.g., cribl, custom lambda pipelines, fluentd)? how well does this work?\n* how much of your normalization is homegrown? are you maintaining your own field mappings and parsers?\n* what\u2019s your biggest pain point: schema drift, broken parsers, volume, cost, lack of context?",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "russian raas actor qilin exploited cve-2025-31324 weeks before its public disclosure",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "what are some of the biggest cybersecurity related things which happened during the russia-ukraine war? hello\n\nas you know the war between ukraine and russia has been going on for quite a while now. i was expecting to see extraordinary cyber attack or defence mechanisms such stuxnet or anything on that level. yet, nothing major seems to have happened in that regard. did i miss something? i have mostly seen minor attacks, but nothing groundbreaking like stuxnet (just to name one...)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "ivanti epmm vulnerabilities exploited in the wild (cve-2025-4427, cve-2025-4428)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "in 2025, how are ethical hackers adapting to the rise of ai-driven defense systems (like anomaly detection and behavioral analytics)? are traditional reconnaissance and exploitation techniques still viable against such intelligent defenses?",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "one click rce was found in asus preinstalled driver software",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "exploiting dll search order hijacking in microsoft edge\u2019s trusted directory this technique leverages\u00a0**dll search order hijacking**\u00a0by placing a malicious\u00a0`well_known_domains.dll`\u00a0in a user-writable directory that is loaded by a trusted microsoft-signed binary\u2014specifically, microsoft edge.\n\n**steps to reproduce:**\n\ncopy the malicious\u00a0`well_known_domains.dll`\u00a0to:  \n`c:\\users\\username\\appdata\\local\\microsoft\\edge\\user data\\well known domains\\x.x.x.x`\n\nlaunch or close microsoft edge. the browser will attempt to load the dll from this path, executing the payload.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "how do i report zero day exploit for voice bots inserted into phone lines?",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "how hackers broke into m&amp;s and co-op: it wasn\u2019t a glitch \u2014 it was human error uk cybersecurity officials are urging retailers to tighten their it support protocols, warning that future attacks could target banks, healthcare providers, or any workplace \u2014 not just retail.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "why do connected smartphones display saved wi-fi passwords, making them easy for users to share with others? - planet vidya is wi-fi password visibility a hidden security flaw?\n\never noticed how connected smartphones display saved wi-fi passwords, making them easy to share with others?\n - planet vidya",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "verisource.com/incident.html for ugly jelly",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "how do you approach threat hunting in practice? i'm trying to get a better understanding of how teams actually run threat hunts day to day. would love to hear how you do it:\n\n* do you start with known threat intel (iocs, ttps) or anomaly-driven hypotheses?\n* what types of threats are you most focused on (e.g. insider threats, apts, cloud abuse, lateral movement)?\n* what specific anomaly patterns or behaviors have proven most useful in your hunts?\n* any go-to threat intel sources or tools that consistently add value?\n\nlooking for both strategic approaches and practical tips.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "easyjson ties to russia https://www.wired.com/story/easyjson-open-source-vk-ties/\n\nanyone have any opinions on this?",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "what are the news source you guys use that is not from western countries i wanted to have unbiased source of news so where do you guys found news that are coming from china or russia that are translated in english",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "here's the source code for the unofficial signal app used by trump officials, telemessage. the source code contains hardcoded credentials and other vulnerabilities.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "devsecops / ai ctf today - ctf.punksecurity.co.uk our ctf runs today, with entry level and difficult challenges across devsecops and ai. no cost to play, some prizes for the best teams. \n\nctfs are little competitive puzzle based games designed to expose you to different tech and have you think in different ways. in our case it\u2019s cicd attacks and ai prompt injection attacks :)\n\nhttps://ctf.punksecurity.co.uk",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "our open-source ransomware analysis &amp; recovery framework!ai-powered detection, and memory forensics all in one toolkit. fight ransomware smarter: https://github.com/sginnora/innora-defender",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "got a brand new phone for free: what do? got a brand new google pixel 9 for free as a secondary device to mess around with. \n\ntaking votes/suggestions for hacks/exploits/modifications i should perform on this thing. i'll release some training videos for whatever gets suggested. \n\nshould probably google if graphene is still a thing for models this new.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "aws guard duty - effectiveness how effective have you found aws guard duty? have you seen it miss detections that should have been alerted on?  its just one source but i haven't read much discussion on how good it is in comparison.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "can we exploit the chaos of collatz orbits to crack rsa by hunting for common divisors at scale?",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "can apple intelligence be trusted? curious, do you trust apple's claims about apple intelligence and how it is truly private? well, you shouldn't because it isn't 100% open source. if it was, you could trust it.\n\ni wrote an article explaining this in detail [https://x.com/freedomtechhq/status/1917689365632893283](https://x.com/freedomtechhq/status/1917689365632893283)\n\nit goes through a 100% open source confidential ai service [https://tinfoil.sh](https://tinfoil.sh) explaining step-by-step how everything works can be verified.\n\nthoughts?",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "if i sent 15 bitcoins for an address, and the address didn't touch the bitcoin and left it like it is forever, what are the chances for law enforcement to find the owner of that address?",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "dynamic malware analysis of open source packages at scale",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "external to internal path mapping tools hi,\n\nmy org has a lot of legacy configuration and little in the way of configurations standards, additionally, there's not much faith in the cmdb as the source of truth.\n\nare there any tools that can take account of f5 and netscaler reverse proxy configurations (access rules, irules, vips etc) and tie in with firewall rules to provide an accurate picture of external access (this should include vpn access to internal resources, access to web servers etc)?\n\nalgosec, firemon, tufin etc are not able to do this, certainly not without significant customisation with their respective ps teams but i wonder if there's something outside of the nspm space that can pick up the slack here?\n\nthanks!",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "browser extension that detects and redacts sensitive information from your ai prompts redactifi is a browser extension designed to detect and redact sensitive information from your ai prompts. it has a built in ml model and also uses advanced pattern recognition. this means that all processing happens locally on your device - your prompts aren't sent or stored anywhere. any thoughts/feedback would be greatly appreciated!\n\ncheck it out here:\u00a0\n\n[https://www.redactifi.com/](https://www.redactifi.com/)\n\nand download for free here:  \n[https://chromewebstore.google.com/detail/hglooeolkncknocmocfkggcddjalmjoa?utm\\_source=item-share-cb](https://chromewebstore.google.com/detail/hglooeolkncknocmocfkggcddjalmjoa?utm_source=item-share-cb)",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "congressional officials wonder how cisa can carry out core mission in face of workforce cuts",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "subdomain + exploit + artificial intelligence - enumerate subdomains, monitor for exploits &amp; chat with a llm.",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "threat modelling database? hi guys! for the past week i am trying to improve my threat modelling skills, but i find it cumbersome to try and find threat assessments done by companies. does anybody know any good links to resources where i can find database for threat modelling or any repository which mantains a database for threat models? thanks!",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "government hackers are leading the use of attributed zero-days, google says",
+        "label": "MEDIUM"
+    },
+    {
+        "text": "summarisation of cross session activation / kerberos relaying attacks",
+        "label": "LOW"
+    },
+    {
+        "text": "noname057(16) pro-russia hacktivists attack dutch organizations",
+        "label": "LOW"
+    },
+    {
+        "text": "real-world kiosk attack: lockdown bypass and physical attack surface exposure",
+        "label": "LOW"
+    },
+    {
+        "text": "xrp supplychain attack: official npm package infected with crypto stealing backdoor",
+        "label": "LOW"
+    },
+    {
+        "text": "attacking my landlord's boiler",
+        "label": "LOW"
+    },
+    {
+        "text": "microsoft windows dxkrnl untrusted pointer dereference local privilege escalation vulnerability | hacksys inc",
+        "label": "LOW"
+    },
+    {
+        "text": "popular scanner miss 80%+ of vulnerabilities in real world software (17 independent studies synthesis) vulnerability scanners detect far less than they claim. but the failure rate isn't anecdotal, it's measurable.\n\nwe compiled results from 17 independent public evaluations - peer-reviewed studies, nist sate reports, and large-scale academic benchmarks.\n\nthe pattern was consistent:  \n**tools that performed well on benchmarks failed on real-world codebases.** in some cases, vendors even requested anonymization out of concerns about how they would be received.\n\nthis isn\u2019t a teardown of any product. it\u2019s a synthesis of already public data, showing how performance in synthetic environments fails to predict real-world results, and how real-world results are often shockingly poor.\n\nhappy to discuss or hear counterpoints, especially from people who\u2019ve seen this from the inside.",
+        "label": "LOW"
+    },
+    {
+        "text": "popular scanners miss 80%+ of vulnerabilities in real-world tests (17 independent studies synthesis) vulnerability scanners detect far less than they claim. but the failure rate isn't anecdotal, it's measurable.\n\nwe compiled results from 17 independent public evaluations - peer-reviewed studies, nist sate reports, and large-scale academic benchmarks.\n\nthe pattern was consistent:  \n**tools that performed well on benchmarks failed on real-world codebases.** in some cases, vendors even requested anonymization out of concerns about how they would be received.\n\nthis isn\u2019t a teardown of any product. it\u2019s a synthesis of already public data, showing how performance in synthetic environments fails to predict real-world results, and how real-world results are often shockingly poor.\n\nhappy to discuss or hear counterpoints, especially from people who\u2019ve seen this from the inside.",
+        "label": "LOW"
+    },
+    {
+        "text": "path traversal vulnerability in aws ssm agent's plugin id validation",
+        "label": "LOW"
+    },
+    {
+        "text": "new attack vector on ai toolchains: tool poisoning in mcps (machine code models)",
+        "label": "LOW"
+    },
+    {
+        "text": "new threat and vulnerability intelligence database",
+        "label": "LOW"
+    },
+    {
+        "text": "codeqleaked \u2013 public secrets exposure leads to potential supply chain attack on github codeql",
+        "label": "LOW"
+    },
+    {
+        "text": "linux supply chain attack journey : critical vulnerabilities on multiple distribution build &amp; packaging systems",
+        "label": "LOW"
+    },
+    {
+        "text": "the dark side of ai: how hackers utilize ai in cyberattacks",
+        "label": "LOW"
+    },
+    {
+        "text": "cve-2025-27509 (cvss 9.3): fleet patches critical saml authentication vulnerability.",
+        "label": "LOW"
+    },
+    {
+        "text": "detecting and mitigating the apache camel vulnerability cve-2025-27636",
+        "label": "LOW"
+    },
+    {
+        "text": "npm run hack:me - a supply chain attack journey",
+        "label": "LOW"
+    },
+    {
+        "text": "old medpy deserialization vulnerability",
+        "label": "LOW"
+    },
+    {
+        "text": "microsoft detects a github-based malvertising attack affecting nearly 1 million devices",
+        "label": "LOW"
+    },
+    {
+        "text": "the burn notice, part 2/5 | how we uncovered a critical vulnerability in a leading ai agent framework",
+        "label": "LOW"
+    },
+    {
+        "text": "sleeping beauty vulnerability: bypassing crowdstrike falcon with one simple trick",
+        "label": "LOW"
+    },
+    {
+        "text": "mitm attack against openssh's verifyhostkeydns-enabled client",
+        "label": "LOW"
+    },
+    {
+        "text": "wallbleed: a memory disclosure vulnerability in the great firewall of china",
+        "label": "LOW"
+    },
+    {
+        "text": "streamlining vulnerability research with ida pro and rust",
+        "label": "LOW"
+    },
+    {
+        "text": "plushdaemon apt: a deep dive into the supply chain attack on ipanyvpn",
+        "label": "LOW"
+    },
+    {
+        "text": "seen it all: detecting active directory attacks with suricata ids [english subtitles]",
+        "label": "LOW"
+    },
+    {
+        "text": "how vulnerable are company leaders to phishing attacks ? results of our study",
+        "label": "LOW"
+    },
+    {
+        "text": "introducing zerodayf, a dynamic, ai-driven code analysis vulnerability scanner",
+        "label": "LOW"
+    },
+    {
+        "text": "cve-2024-55957: local privilege escalation vulnerability in thermo scientific\u2122 xcalibur\u2122 and foundation software",
+        "label": "LOW"
+    },
+    {
+        "text": "8 million requests later, we made the solarwinds supply chain attack look amateur - watchtowr labs",
+        "label": "LOW"
+    },
+    {
+        "text": "speculation attacks on apple m3: slap and flop",
+        "label": "LOW"
+    },
+    {
+        "text": "blackhat seo javascript attack on 500 gov and uni websites",
+        "label": "LOW"
+    },
+    {
+        "text": "government and university websites targeted in scriptapi[.]dev client-side attack",
+        "label": "LOW"
+    },
+    {
+        "text": "attacks on maven proxy repositories",
+        "label": "LOW"
+    },
+    {
+        "text": "cookie sandwich - new attack steals httponly cookies",
+        "label": "LOW"
+    },
+    {
+        "text": "testing prompt injection attacks with promptmap2",
+        "label": "LOW"
+    },
+    {
+        "text": "vulnerability archeology: stealing passwords with ibm i access client solutions",
+        "label": "LOW"
+    },
+    {
+        "text": "2024 cves in review \u2013 vulnerability blog",
+        "label": "LOW"
+    },
+    {
+        "text": "baitroute: a web honeypot library to create vulnerable-looking endpoints to detect and mislead attackers",
+        "label": "LOW"
+    },
+    {
+        "text": "vulnerability scanner for ethereum smart contracts! \ud83d\udea8",
+        "label": "LOW"
+    },
+    {
+        "text": "over 5,000 wordpress sites caught in wp3.xyz malware attack",
+        "label": "LOW"
+    },
+    {
+        "text": "the ddos attack that shattered the internet",
+        "label": "LOW"
+    },
+    {
+        "text": "machine identities are the next big target for attackers",
+        "label": "LOW"
+    },
+    {
+        "text": "ddos and other attacks: advanced incident response",
+        "label": "LOW"
+    },
+    {
+        "text": "another jwt algorithm confusion vulnerability: cve-2024-54150",
+        "label": "LOW"
+    },
+    {
+        "text": "new windows privilege escalation vulnerability!",
+        "label": "LOW"
+    },
+    {
+        "text": "authentication bypass vulnerability in philips intellispace cardiovascular",
+        "label": "LOW"
+    },
+    {
+        "text": "privilege escalation: attacking auxiliary binaries for persistence and clout",
+        "label": "LOW"
+    },
+    {
+        "text": "attacking cortex xdr from an unprivileged user perspective",
+        "label": "LOW"
+    },
+    {
+        "text": "the ultralytics supply chain attack: connecting the dots with gitguardian\u2019s public monitoring data",
+        "label": "LOW"
+    },
+    {
+        "text": "the ruby on rails _json juggling attack",
+        "label": "LOW"
+    },
+    {
+        "text": "from xss vulnerability to full admin access",
+        "label": "LOW"
+    },
+    {
+        "text": "zizmor would have caught the ultralytics workflow vulnerability",
+        "label": "LOW"
+    },
+    {
+        "text": "new dog, old tricks: damagecard attack targets memory directly thru sd card reader",
+        "label": "LOW"
+    },
+    {
+        "text": "u.s. officials tell americans to use encrypted apps as scope of cyberattack grows",
+        "label": "LOW"
+    },
+    {
+        "text": "research: automated attacks defeats secrets rotation",
+        "label": "LOW"
+    },
+    {
+        "text": "new pe vulnerability in windows os!",
+        "label": "LOW"
+    },
+    {
+        "text": "attacking hypervisors - a practical case [pwn2own vancouver 2024]",
+        "label": "LOW"
+    },
+    {
+        "text": "the nearest neighbor attack: how a russian apt weaponized nearby wi-fi networks for covert access",
+        "label": "LOW"
+    },
+    {
+        "text": "the cost of a nand chip off attack is 170.83\u20ac",
+        "label": "LOW"
+    },
+    {
+        "text": "for anyone affected by cve-2023-12345 in libfoo,here\u2019s what worked for me: upgraded to v2.6 and monitored network traffic for anomalies.it seems like a complex vulnerability but definitely patchworthy",
+        "label": "LOW"
+    },
+    {
+        "text": "a new era of macos sandbox escapes: overlooked attack surface, 10+ new vulns",
+        "label": "LOW"
+    },
+    {
+        "text": "vulnerability management program pack v1.2",
+        "label": "LOW"
+    },
+    {
+        "text": "github - protectai/vulnhuntr: zero shot vulnerability discovery using llms",
+        "label": "LOW"
+    },
+    {
+        "text": "censorship attack against the tor network",
+        "label": "LOW"
+    },
+    {
+        "text": "attackers hiding hostnames on ethereum blockchain; target puppeteer users in typosquat campaign",
+        "label": "LOW"
+    },
+    {
+        "text": "supply chain attack - malicious code in lottie-player js cdn files version &gt; 2.0.4 &lt;= 2.0.8",
+        "label": "LOW"
+    },
+    {
+        "text": "various application and windows denials of service via attacking the clipboard",
+        "label": "LOW"
+    },
+    {
+        "text": "a vulnerability in the common log file system (clfs) driver allows a local user to gain elevated privileges on windows 11",
+        "label": "LOW"
+    },
+    {
+        "text": "attacking apis using json injection",
+        "label": "LOW"
+    },
+    {
+        "text": "finding vulnerability variants at scale https://blackwinghq.com/blog/posts/finding-vulnerability-variants-at-scale/",
+        "label": "LOW"
+    },
+    {
+        "text": "fortinet fortigate cve-2024-23113 - a super complex vulnerability in a super secure appliance in 2024 - watchtowr labs",
+        "label": "LOW"
+    },
+    {
+        "text": "the state of attacks on genai | analysis of real-world attacks",
+        "label": "LOW"
+    },
+    {
+        "text": "redefining ransomware attacks on aws using aws kms xks",
+        "label": "LOW"
+    },
+    {
+        "text": "i am building xss attacks defender =&gt; please roast my solution (feedback request)",
+        "label": "LOW"
+    },
+    {
+        "text": "the internet archive is under attack, with a breach revealing info for 31 million accounts",
+        "label": "LOW"
+    },
+    {
+        "text": "mitre blog post: emulating complete, realistic attack chains with the new caldera bounty hunter plugin",
+        "label": "LOW"
+    },
+    {
+        "text": "polish pm tusk blames russian hackers for cyberattacks ahead of presidential election",
+        "label": "LOW"
+    },
+    {
+        "text": "european vulnerability database goes live, but who benefits?",
+        "label": "LOW"
+    },
+    {
+        "text": "world's first cpu-level ransomware can \"bypass every freaking traditional technology we have out there\" \u2014 new firmware-based attacks could usher in new era of unavoidable ransomware",
+        "label": "LOW"
+    },
+    {
+        "text": "empty shelves but co-op says payments fixed after cyber attack",
+        "label": "LOW"
+    },
+    {
+        "text": "magento supply chain attack \u2013 6-year-old backdoor just activated",
+        "label": "LOW"
+    },
+    {
+        "text": "vulnerability summary for the week of april 28, 2025 | cisa",
+        "label": "LOW"
+    },
+    {
+        "text": "m&amp;s pauses recruitment amid ongoing cyber attack",
+        "label": "LOW"
+    },
+    {
+        "text": "cyberattack disrupts georgia\u2019s coweta county school system, classes continue",
+        "label": "LOW"
+    },
+    {
+        "text": "hackers boast that they took 20million co-op customers' details in cyber attack",
+        "label": "LOW"
+    },
+    {
+        "text": "fbi's $10 million bounty on chinese hacker amid russian ddos attacks and tiktok's \u20ac530 million gdpr fine",
+        "label": "LOW"
+    },
+    {
+        "text": "with the m and s and co op attacks being about customer data, could this be a disgruntled employee causing a fire sale?",
+        "label": "LOW"
+    },
+    {
+        "text": "retail sector attacks i\u2019ve not been able to find a technical thread on the attacks hitting the retail sector in the u.k. i was wondering if anyone had any specific actions they\u2019re taking they can share? i know a lot of focus has been around ad and ntds but social engineering and helpdesk resets is also a big part of it?\n\nany intel anyone is willing to share would be great!",
+        "label": "LOW"
+    },
+    {
+        "text": "cyberattack disrupts bartlesville, oklahoma schools, postpones state testing",
+        "label": "LOW"
+    },
+    {
+        "text": "harrods latest retailer to be hit by cyber attack",
+        "label": "LOW"
+    },
+    {
+        "text": "oracle under attack: what does this mean for businesses?",
+        "label": "LOW"
+    },
+    {
+        "text": "do passkeys protect from proxy aitm attacks i'm reading up on passkeys and they claim to be phishing resistant but i'm curious how a passkey protects from a phishing email where the user clicks on a link and the attacker is proxying the login to m365? wouldn't they just be proxying the passkey login process/relaying the qr code in the same manner to gain access? i'm struggling to figure out how passkeys are better in this scenario.",
+        "label": "LOW"
+    },
+    {
+        "text": "co-op fends off hackers as police probe m&amp;s cyber attack",
+        "label": "LOW"
+    },
+    {
+        "text": "nationwide power outages in spain and portugal, what do you think? sorry if this is not the right place to talk about it, but as the title says, thought it would be interesting to spark a debate on the power outage that occured across the entire countries of spain and portugal.\n\n15 gwts of power were lost in a matter of 5 seconds, which accounts for about 60% of spain's national demand. some institutions are already discarding a cyber attack, while others still aren't disregarding any possible causes. what do you guys think?\n\nhttps://www.bbc.com/news/articles/cd6jenl581vo\n\nhttps://www.bbc.com/news/articles/c209yrl3258o",
+        "label": "LOW"
+    },
+    {
+        "text": "france accuses russia of escalating cyberattacks since 2021, charges gru's 'fancy bear' unit",
+        "label": "LOW"
+    },
+    {
+        "text": "protecting against indirect prompt injection attacks in mcp",
+        "label": "LOW"
+    },
+    {
+        "text": "vulnerability summary for the week of april 21, 2025 | cisa",
+        "label": "LOW"
+    },
+    {
+        "text": "department store has been offline for 4 days a national department store chain has been completely offline for 4 days now. the credit card terminals work, but the phones are all down. credit card terminals require a phone line or cellular line for payments so i\u2019m not sure how they\u2019ve kept that working.\n\noutlook and every application that all store-level managers use across the entire company have been offline for four days. i\u2019ve never had much interest in the hacking business before, but because the company left a bad taste in my mouth to begin with i\u2019m interested to know if this is malicious or not.\n\nso, is it an attack or just a lack of good management?",
+        "label": "LOW"
+    },
+    {
+        "text": "ransomware attack data: distribution of attacks over time by top 20 groups (2023 &amp; 2024)",
+        "label": "LOW"
+    }
+]

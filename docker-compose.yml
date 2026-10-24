@@ -1,0 +1,29 @@
+# JSONL storage (default, verified):   docker compose up --build        -> http://localhost:8000
+# PostgreSQL storage (EXPERIMENTAL):   docker compose --profile postgres up --build
+#   then set DB_URL in .env:  DB_URL=postgresql://evvp:evvp@db:5432/evvp
+services:
+  backend:
+    build: .
+    env_file: [{ path: .env, required: false }]
+    ports: ["127.0.0.1:8000:8000"]          # localhost only; add a reverse proxy + EVVP_API_TOKEN before exposing remotely
+    volumes:
+      - evvp_raw:/app/raw_data              # collected evidence (first start is seeded from the image)
+      - evvp_data:/app/data                 # source registry, analyst decisions, snapshots
+      - evvp_logs:/app/logs                 # audit trail
+  db:
+    image: postgres:16
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_DB: evvp
+      POSTGRES_USER: evvp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-evvp}
+    volumes: ["evvp_pg:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evvp -d evvp"]
+      interval: 5s
+      retries: 10
+volumes:
+  evvp_raw:
+  evvp_data:
+  evvp_logs:
+  evvp_pg:

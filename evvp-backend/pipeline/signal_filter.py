@@ -8,6 +8,7 @@ import re
 from dataclasses import dataclass, field
 
 from config.settings import MIN_SIGNAL_SCORE, EXPLOIT_DEV_MIN_SCORE, HIGH_CONF_MIN_SCORE
+from pipeline.risk import _pattern as _term_re   # word-boundary matcher shared with the risk engine
 
 CAT_HIGH_CONF   = "high_confidence_vulnerability_signal"
 CAT_EXPLOIT_DEV = "exploit_development_discussion"
@@ -24,6 +25,7 @@ POSITIVE_SIGNALS: dict[str, int] = {
     "in the wild":                6,
     # Zero-day
     "0day":                       9,
+    "0-day":                      9,
     "zero-day":                   9,
     "zero day":                   9,
     "unpatched vulnerability":    8,
@@ -153,7 +155,7 @@ NOISE_REPOS: set[str] = {
 
 _HIGH_CONF_KW = {
     "actively exploited", "exploited in the wild", "exploit in the wild",
-    "0day", "zero-day", "zero day", "rce", "remote code execution",
+    "0day", "0-day", "zero-day", "zero day", "rce", "remote code execution",
     "unauthenticated rce", "auth bypass", "authentication bypass",
     "sandbox escape", "container escape", "kernel exploit",
     "exploit released", "exploit available", "working exploit",
@@ -200,7 +202,7 @@ def _corpus(item: dict) -> str:
 def _score_positive(corpus: str) -> tuple[int, list[str]]:
     total, matched = 0, []
     for term, pts in POSITIVE_SIGNALS.items():
-        if term in corpus:
+        if _term_re(term).search(corpus):
             total += pts
             matched.append(term)
     cves = list(set(_CVE_RE.findall(corpus)))
@@ -212,11 +214,13 @@ def _score_positive(corpus: str) -> tuple[int, list[str]]:
 
 def _score_negative(title: str, corpus: str) -> tuple[int, list[str]]:
     total, matched = 0, []
+    tl = title.lower()
     for term, pts in NEGATIVE_SIGNALS.items():
-        if term in title.lower():
+        pat = _term_re(term)
+        if pat.search(tl):
             total += pts * 2
             matched.append(term)
-        elif term in corpus:
+        elif pat.search(corpus):
             total += pts
     if any(nr in title.lower() for nr in NOISE_REPOS):
         total += 15

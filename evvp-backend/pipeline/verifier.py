@@ -18,6 +18,8 @@ from datetime import datetime, timezone
 
 import requests
 
+from config.settings import GITHUB_API_URL
+
 from utils.logger import get_logger
 
 logger = get_logger("verifier")
@@ -50,9 +52,7 @@ _POC_EXTENSIONS = {".py", ".c", ".cpp", ".rb", ".go", ".rs", ".sh", ".ps1", ".js
 
 # Keywords in repo description/README that indicate PoC
 _POC_KEYWORDS = {
-    "exploit", "poc", "proof of concept", "proof-of-concept",
-    "rce", "lpe", "privilege escalation", "remote code execution",
-    "shellcode", "payload", "bypass", "vulnerability",
+    "exploit", "poc", "proof of concept", "proof-of-concept", "exploit code", "shellcode", "weaponized",
 }
 
 # Product/vendor extraction patterns
@@ -111,6 +111,9 @@ def verify(item: dict, cross_source_count: int = 1) -> dict:
         "cross_source_count": cross_source_count,
         "verification_status": status,
         "verified_at":        datetime.now(timezone.utc).isoformat(),
+        "risk_score":         item.get("intelligence", {}).get("risk_score", 0),
+        "zero_day_score":     item.get("intelligence", {}).get("zero_day_score", 0),
+        "attack_techniques":  item.get("intelligence", {}).get("attack_techniques", []),
     }
 
 
@@ -129,9 +132,9 @@ def _check_poc(url: str, text: str) -> tuple[bool, list[str]]:
             return True, signals
 
     # Text-based PoC signals
-    text_lower = text.lower()
+    from pipeline.risk import has_term          # word-boundary match: "poc" must not match "pocket"
     for kw in _POC_KEYWORDS:
-        if kw in text_lower:
+        if has_term(text, (kw,)):
             signals.append(f"keyword:{kw}")
 
     poc_in_text = any(s.startswith("keyword:") for s in signals)
@@ -149,7 +152,7 @@ def _inspect_github_repo(repo: str) -> tuple[bool, list[str]]:
 
         # Get repo metadata
         r = requests.get(
-            f"https://api.github.com/repos/{repo}",
+            f"{GITHUB_API_URL}/repos/{repo}",
             headers=headers, timeout=10
         )
         if r.status_code != 200:
@@ -173,7 +176,7 @@ def _inspect_github_repo(repo: str) -> tuple[bool, list[str]]:
 
         # Get file tree (top level)
         r2 = requests.get(
-            f"https://api.github.com/repos/{repo}/contents",
+            f"{GITHUB_API_URL}/repos/{repo}/contents",
             headers=headers, timeout=10
         )
         if r2.status_code == 200:
@@ -272,7 +275,8 @@ def _check_nvd_status(item: dict) -> tuple[bool, str]:
         text = f"{item.get('title', '')} {item.get('text', '')[:500]}"
         cve_ids = list(set(_CVE_RE.findall(text)))
 
-    return bool(cve_ids and nvd_data), ""
+    # A CVE identifier alone is not proof that NVD has a record.
+    return False, ""
 
 
 # ── Status determination ──────────────────────────────────────────────────────

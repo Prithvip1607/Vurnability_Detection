@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EVVP — Vulnerability Intelligence</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234da3ff'/%3E%3Cpath d='M8 9h16v3H12v3h10v3H12v3h12v3H8z' fill='%2304101f'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/ui/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><b>EVVP</b> Intelligence</div>
+  <nav id="nav" aria-label="Main">
+    <a href="#/" data-r="">Overview</a>
+    <a href="#/findings" data-r="findings">Findings</a>
+    <a href="#/zerodays" data-r="zerodays">Zero-Days</a>
+    <a href="#/cves" data-r="cves">CVEs</a>
+    <a href="#/trending" data-r="trending">Trending</a>
+    <a href="#/landscape" data-r="landscape">Threat Landscape</a>
+    <a href="#/sources" data-r="sources">Sources</a>
+    <a href="#/audit" data-r="audit">Audit</a>
+  </nav>
+  <div class="tools">
+    <input id="quick" type="search" placeholder="Search findings…" aria-label="Search findings" style="width:170px">
+    <span class="health" id="health" title="API status"><span class="dot"></span><span>…</span></span>
+    <button id="settings" title="Analyst name, API token, theme">⚙ Settings</button>
+  </div>
+</header>
+<main id="app" tabindex="-1"></main>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<noscript><p style="padding:20px">EVVP's dashboard needs JavaScript.</p></noscript>
+<script src="/ui/core.js"></script>
+<script src="/ui/pages.js"></script>
+
+</body>
+</html>

@@ -5,11 +5,14 @@ No credentials required.
 import time
 from datetime import datetime, timezone
 
-import feedparser
 import requests
 
-from config.settings import SUBREDDITS, REDDIT_POLL_INTERVAL
+from config.settings import TICK_SECONDS
+from config.settings import REDDIT_BASE_URL, SUBREDDITS
+from ingestion.feedparse import parse_feed
 from pipeline.processor import process
+from source_manager import manager
+from utils.audit import audit, EV_SOURCE_FETCH_FAIL
 from utils.logger import get_logger
 from utils.retry import retry
 
@@ -28,7 +31,7 @@ def _build_item(post: dict, subreddit: str) -> dict:
         "text":     post.get("selftext", ""),
         "author":   post.get("author", "[deleted]"),
         "timestamp": created,
-        "url":      f"https://www.reddit.com{post.get('permalink', '')}",
+        "url":      f"{REDDIT_BASE_URL}{post.get('permalink', '')}",
         "metadata": {
             "score":        post.get("score"),
             "num_comments": post.get("num_comments"),
@@ -40,9 +43,9 @@ def _build_item(post: dict, subreddit: str) -> dict:
     }
 
 
-@retry(max_attempts=3, base_delay=5.0)
+@retry(max_attempts=2, base_delay=3.0)
 def _fetch_json(subreddit: str) -> tuple[int, int]:
-    url = f"https://www.reddit.com/r/{subreddit}/new.json?limit=100"
+    url = f"{REDDIT_BASE_URL}/r/{subreddit}/new.json?limit=100"
     r = requests.get(url, headers=_HEADERS, timeout=15)
     r.raise_for_status()
     fetched = saved = 0
@@ -54,18 +57,20 @@ def _fetch_json(subreddit: str) -> tuple[int, int]:
     return fetched, saved
 
 
-@retry(max_attempts=3, base_delay=5.0)
+@retry(max_attempts=2, base_delay=3.0)
 def _fetch_rss(subreddit: str) -> tuple[int, int]:
-    feed = feedparser.parse(f"https://www.reddit.com/r/{subreddit}/new.rss")
+    r = requests.get(f"{REDDIT_BASE_URL}/r/{subreddit}/new.rss", headers=_HEADERS, timeout=15)
+    r.raise_for_status()
+    feed = parse_feed(r.content)
     fetched = saved = 0
-    for entry in feed.entries:
+    for entry in feed["entries"]:
         fetched += 1
         item = {
-            "id":       f"reddit_rss_{entry.get('id', entry.link)}",
+            "id":       f"reddit_rss_{entry.get('id') or entry.get('link')}",
             "platform": "reddit",
             "source":   f"r/{subreddit}",
             "title":    entry.get("title", ""),
-            "text":     entry.get("summary", ""),
+            "text":     entry.get("content", ""),
             "author":   entry.get("author", ""),
             "timestamp": entry.get("published", ""),
             "url":      entry.get("link", ""),
@@ -77,23 +82,36 @@ def _fetch_rss(subreddit: str) -> tuple[int, int]:
     return fetched, saved
 
 
-def run_once() -> None:
+def run_once(force: bool = False) -> None:
+    if not manager.gate("builtin-reddit", force):
+        return
+    ok = failed = 0
+    last_error = ""
     for sub in SUBREDDITS:
         try:
             _fetch_json(sub)
+            ok += 1
         except Exception as e:
             logger.warning("JSON failed r/%s: %s — trying RSS", sub, e)
             try:
                 _fetch_rss(sub)
+                ok += 1
             except Exception as e2:
+                failed += 1
+                last_error = str(e2)
                 logger.error("RSS also failed r/%s: %s", sub, e2)
+    if ok == 0 and failed:
+        manager.mark_fetch("builtin-reddit", success=False, error=f"all subreddits failed: {last_error}")
+        audit(EV_SOURCE_FETCH_FAIL, source="Reddit", source_id="builtin-reddit", error=last_error[:300])
+    else:
+        manager.mark_fetch("builtin-reddit", success=True, item_count=ok)
 
 
 def run_continuous() -> None:
-    logger.info("Reddit ingestion started (interval=%ds)", REDDIT_POLL_INTERVAL)
+    logger.info("Reddit collector started (interval comes from the Source Manager)")
     while True:
         try:
             run_once()
         except Exception as e:
             logger.error("Reddit cycle error: %s", e)
-        time.sleep(REDDIT_POLL_INTERVAL)
+        time.sleep(TICK_SECONDS)

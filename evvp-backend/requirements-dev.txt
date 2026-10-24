@@ -1,0 +1,5 @@
+# Development / testing / browser verification
+-r requirements.txt
+-r requirements-optional.txt
+pytest>=8.0
+playwright>=1.40   # then: playwright install chromium   (only for scripts/demo.py --browser)

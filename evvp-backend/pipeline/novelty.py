@@ -7,7 +7,7 @@ Checks:
   2. URL match (same article re-collected)
   3. CVE ID overlap with recently stored items
   4. Title similarity >= 0.72 (fuzzy — catches reposts with slightly different titles)
-  5. Keyword fingerprint — same platform + same top exploit keywords = same story
+  5. Distinctive-token match — same product/codename words (generic terms like "RCE" never merge)
 """
 from __future__ import annotations
 import re
@@ -17,16 +17,25 @@ from dataclasses import dataclass
 from config.settings import NOVELTY_LOOKBACK_DAYS
 from storage.db import load_recent_raw
 
-_CVE_RE = re.compile(r"CVE-\d{4}-\d+", re.IGNORECASE)
+_CVE_RE = re.compile(r"CVE-\d{4}-\d{4,}", re.IGNORECASE)
 
-# High-signal terms used to fingerprint a vulnerability story
-_FINGERPRINT_TERMS = [
-    "zero-day", "0day", "rce", "remote code execution", "unauthenticated",
-    "auth bypass", "privilege escalation", "sandbox escape", "kernel exploit",
-    "use-after-free", "heap overflow", "memory corruption", "poc",
-    "proof of concept", "exploit released", "actively exploited",
-    "exploited in the wild", "working exploit", "container escape",
-]
+# Words that describe *any* vulnerability story and therefore never identify a specific one.
+_GENERIC = {
+    "vulnerability", "vulnerabilities", "exploit", "exploited", "exploits", "security", "remote", "code",
+    "execution", "critical", "flaw", "flaws", "patch", "patches", "patched", "released", "release", "attack",
+    "attacks", "attackers", "hackers", "actively", "researchers", "researcher", "update", "updates", "with",
+    "from", "that", "this", "into", "after", "over", "using", "used", "have", "been", "their", "which", "could",
+    "allow", "allows", "affecting", "impacting", "against", "about", "than", "more", "newly", "zero", "days",
+    "dubbed", "shows", "gets", "unpatched", "bug", "bugs", "issue", "warns", "hits", "under", "unauthenticated",
+    "authentication", "bypass", "privilege", "escalation", "injection",
+    "wild", "exploitation", "exploiting", "public", "publicly", "available", "disclosed", "discloses", "disclosure", "vendor",
+    "confirms", "confirmed", "reported", "reports", "reportedly", "software", "firmware", "version", "versions", "users",
+    "servers", "devices", "appliances", "products", "product", "systems", "platform", "instances", "customers", "latest",
+    "urgent", "advisory", "alert", "fixes", "fixed", "fixing", "arbitrary", "executes", "execute", "hits", "hit", "hijack",
+    "takeover", "chain", "multiple", "several", "major", "serious", "severe", "high", "severity", "risk", "threat", "threats",
+}
+DISTINCT_MIN_SHARED = 2        # distinctive title tokens two reports must share to be the same story
+DISTINCT_MIN_COVERAGE = 0.6    # ... covering at least this share of the shorter title
 
 
 @dataclass
@@ -37,8 +46,8 @@ class NoveltyResult:
 
 
 def _extract_cves(item: dict) -> set[str]:
-    text = f"{item.get('title', '')} {item.get('text', '')[:1000]}"
-    return {c.upper() for c in _CVE_RE.findall(text)}
+    text = f"{item.get('title', '')} {(item.get('text') or '')[:1000]}"
+    return {c.upper() for c in _CVE_RE.findall(text)} | {c.upper() for c in (item.get("cve_ids") or [])}
 
 
 def _normalize(text: str) -> str:
@@ -55,10 +64,21 @@ def _token_overlap(a: str, b: str) -> float:
     return len(ta & tb) / len(ta | tb)
 
 
-def _keyword_fingerprint(item: dict) -> frozenset[str]:
-    """Extract which high-signal terms appear in title+text."""
-    text = _normalize(f"{item.get('title', '')} {item.get('text', '')[:500]}")
-    return frozenset(t for t in _FINGERPRINT_TERMS if t in text)
+def _distinct_tokens(title: str) -> set[str]:
+    """Product / vendor / codename words in a title (generic vulnerability vocabulary removed)."""
+    return {t for t in re.findall(r"[a-z0-9]{4,}", _normalize(title)) if t not in _GENERIC}
+
+
+def _same_story(a_title: str, b_title: str) -> bool:
+    """Two titles describe one story if they share >=2 distinctive tokens covering most of the shorter one.
+
+    Sharing only generic terms ("RCE", "actively exploited") never merges unrelated stories.
+    """
+    ta, tb = _distinct_tokens(a_title), _distinct_tokens(b_title)
+    shared = len(ta & tb)
+    if shared < DISTINCT_MIN_SHARED:
+        return False
+    return shared / max(1, min(len(ta), len(tb))) >= DISTINCT_MIN_COVERAGE
 
 
 def check(item: dict, existing: list[dict] | None = None) -> NoveltyResult:
@@ -69,7 +89,6 @@ def check(item: dict, existing: list[dict] | None = None) -> NoveltyResult:
     item_url   = item.get("url", "")
     item_cves  = _extract_cves(item)
     item_title = item.get("title", "")
-    item_fp    = _keyword_fingerprint(item)
 
     for ex in existing:
         # 1. Exact ID
@@ -97,15 +116,8 @@ def check(item: dict, existing: list[dict] | None = None) -> NoveltyResult:
             if sim >= 0.72:
                 return NoveltyResult(False, f"title_similarity:{sim:.2f}", ex.get("id", ""))
 
-        # 5. Keyword fingerprint — same 3+ exploit terms = same story, different source
-        if len(item_fp) >= 3:
-            ex_fp = _keyword_fingerprint(ex)
-            common = item_fp & ex_fp
-            if len(common) >= 3:
-                return NoveltyResult(
-                    False,
-                    f"keyword_fingerprint:{','.join(sorted(common)[:3])}",
-                    ex.get("id", ""),
-                )
+        # 5. Same product/codename story reported with different wording
+        if item_title and ex.get("title") and _same_story(item_title, ex["title"]):
+            return NoveltyResult(False, "distinctive_title_match", ex.get("id", ""))
 
     return NoveltyResult(True, "novel")

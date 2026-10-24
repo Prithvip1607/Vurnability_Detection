@@ -1,0 +1,11 @@
+**/.venv
+**/__pycache__
+**/node_modules
+evvp-frontend
+legacy_v1
+docs
+.git
+.env
+evvp-backend/.env
+evvp-backend/logs/*
+evvp-backend/data/*
