@@ -1,9 +1,28 @@
+# __pycache__/
+# *.pyc
+# *.pyo
+# .env
+# logs/
+# raw_data/
+# *.jsonl
+# *.json
+# !.env.example
+# Environment secrets
+# Temporary files and test cache
+*.tmp
+.pytest_cache/
 __pycache__/
-*.pyc
-*.pyo
-.env
-logs/
-raw_data/
-*.jsonl
-*.json
-!.env.example
+
+# Local logs
+*.log
+evvp-backend/logs/
+
+# Runtime data
+evvp-backend/raw_data/
+evvp-backend/data/entities.json
+evvp-backend/data/sources.json
+evvp-backend/data/analyst_decisions.jsonl
+evvp-backend/data/*.corrupt
+evvp-backend/data/entities.json
+data/entities.json
+data/sources.json
