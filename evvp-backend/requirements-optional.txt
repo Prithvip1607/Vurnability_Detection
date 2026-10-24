@@ -1,0 +1,3 @@
+# Optional extras (each is detected at runtime; EVVP says so explicitly when a configured feature needs one)
+psycopg2-binary>=2.9,<3   # required ONLY when DB_URL is set (PostgreSQL storage)
+openai>=1.0,<3            # required ONLY for AI-written summaries (OPENAI_API_KEY)

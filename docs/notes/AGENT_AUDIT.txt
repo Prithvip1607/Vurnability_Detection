@@ -1,0 +1,299 @@
+================================================================================
+  EVVP — AI AGENT WORK AUDIT LOG
+  What was done, when, and why — full session record
+================================================================================
+
+NOTE: logs/audit.jsonl and logs/audit.log are RUNTIME logs.
+They will be populated once you run: python main.py
+This file is the DEVELOPMENT audit — what the AI agent built and changed.
+
+--------------------------------------------------------------------------------
+  SESSION 1 — BRANCH SETUP
+--------------------------------------------------------------------------------
+
+ACTION: Stashed local changes on Jayant01 branch, switched to nagal2
+  - git stash (saved WIP on Jayant01: 589e5b4)
+  - git fetch origin nagal2
+  - git checkout nagal2
+REASON: User wanted to work on nagal2 branch as fresh separate work
+
+ACTION: Compared Jayant01 vs nagal2 branches
+  - Jayant01: simple static app.py reading from dataset/final_structured_dataset.json
+              3 endpoints, no collectors, no real-time ingestion
+  - nagal2:   full production system with collectors, signal filter, storage, dashboard
+FINDING: nagal2 is the correct base — Jayant01 was a prototype with static data
+
+--------------------------------------------------------------------------------
+  SESSION 2 — BACKEND FIXES ON NAGAL2
+--------------------------------------------------------------------------------
+
+FILE: database/storage.py
+  PROBLEM: Bare global _conn — not thread-safe, 3 collector threads race on it
+  FIX: Replaced with psycopg2.ThreadedConnectionPool (min=1, max=5)
+  PROBLEM: JSONL _save_json had no deduplication — same item written on every poll
+  FIX: Added per-file threading.Lock + in-memory _seen_ids set
+       On restart: reads existing IDs from file before writing (_load_existing_ids)
+  ADDED: 3 DB indexes (platform, signal_score DESC, collected_at DESC)
+
+FILE: dashboard/app.py
+  PROBLEM: load_recent() read ALL files on every API request — O(n) file I/O
+  FIX: Added 60-second TTL in-memory cache (_cached)
+  PROBLEM: No pagination — hard cap of 60/100 items
+  FIX: Added _paginate() with page/per_page params, 200-item hard cap
+  PROBLEM: Search had no upper bound on query length
+  FIX: Validated 3 <= len(q) <= 200
+  PROBLEM: load_recent() duplicated in dashboard and zero_day_hunter
+  FIX: Consolidated into single _load_recent() with dedup by id/url
+  ADDED: Platform validation on /api/feed/<platform> — returns 400 for unknown
+
+FILE: utils/zero_day_hunter.py
+  PROBLEM: _load_all() deduplicated by URL only (after load) — missed ID dupes
+  FIX: Deduplicates by id during load, handles json.JSONDecodeError per line
+
+--------------------------------------------------------------------------------
+  SESSION 3 — FULL REPO RESTRUCTURE
+--------------------------------------------------------------------------------
+
+DECISION: Restructure entire project into professional separated repos
+  evvp-backend/   — standalone Python backend service
+  evvp-frontend/  — placeholder for Phase 2 React frontend
+
+REASON: Old structure had everything flat — collectors, dashboard, utils all mixed
+        No separation of concerns, not scalable, not professional
+
+CREATED: evvp-backend/ with full directory structure:
+  ingestion/    — one file per data source
+  pipeline/     — processing stages
+  storage/      — db layer
+  scheduler/    — thread runner
+  api/          — REST API (JSON only, no HTML)
+  config/       — settings
+  utils/        — shared utilities
+
+FILES CREATED:
+
+  config/settings.py
+    - All config from .env
+    - Added NVD_POLL_INTERVAL, NOVELTY_LOOKBACK_DAYS
+    - Added 12 subreddits (was 8), 25 GitHub keywords (was 24)
+    - Added 18 RSS feeds (was 13) — added Rapid7, CrowdStrike, Recorded Future,
+      ZDI, Seclists Full Disclosure
+
+  utils/logger.py       — rotating file + console logger (unchanged logic)
+  utils/retry.py        — exponential backoff decorator (unchanged logic)
+  utils/rate_limiter.py — token bucket rate limiter (unchanged logic)
+
+  storage/db.py
+    - Thread-safe PostgreSQL ThreadedConnectionPool (min=1, max=10)
+    - Two tables: intel_raw + intel_verified
+    - intel_verified: stores novelty result + severity estimate + NVD data
+    - Per-file threading.Lock for JSONL writes
+    - In-memory seen-ID set with disk bootstrap on startup
+    - 4 DB indexes on intel_raw, 2 on intel_verified
+    - load_recent_raw() — single source of truth for reading data
+
+  pipeline/signal_filter.py
+    - Kept all 70+ positive signals, 50+ negative signals
+    - Added: "use after free", "server-side request forgery",
+             "xml external entity", "dependency confusion"
+    - analyze() returns FilterResult dataclass
+
+  pipeline/novelty.py  [NEW]
+    - Checks if item is truly new vs already stored
+    - 4 checks: exact ID, URL match, CVE overlap, title similarity (Jaccard >= 85%)
+    - Looks back NOVELTY_LOOKBACK_DAYS (default 30)
+    - Returns NoveltyResult(is_novel, reason, duplicate_id)
+
+  pipeline/nvd_enricher.py  [NEW]
+    - Calls NVD REST API v2.0 for each CVE ID found in item
+    - Attaches CVSS v3/v2 score, severity, description, references
+    - In-process cache (_CACHE dict) prevents duplicate NVD lookups
+    - Polite rate: 0.6s sleep between calls (NVD limit ~100/min without key)
+
+  pipeline/tracker.py  [NEW]
+    - Records every CVE mention with {ts, platform, url, title}
+    - Spike detection: N mentions in SPIKE_WINDOW_HOURS = TRENDING
+    - Cooldown: don't re-alert same CVE within TREND_COOLDOWN_MINS
+    - Persists to raw_data/cve_mentions.jsonl (survives restarts)
+    - load_from_disk() called on startup
+    - register_trending_callback() — notifier registers here
+    - get_trending(hours, top_n) — returns sorted CVE mention counts
+
+  pipeline/notifier.py  [NEW]
+    - dispatch(event) — fires all channels in background threads
+    - dispatch_trending(trending_event) — called by tracker callbacks
+    - Channels: console log (always), webhook (Slack/Discord), SMTP email
+    - _should_notify() filter: score >= NOTIFY_MIN_SCORE AND severity in filter
+    - Trending CVEs always notify regardless of filter
+    - Emoji-coded console output by severity
+
+  pipeline/processor.py
+    - Orchestrates all 7 pipeline stages
+    - Stage 1: signal_filter.analyze()
+    - Stage 2: nvd_enricher.enrich()
+    - Stage 3: novelty.check()
+    - Stage 4: storage.save_raw()
+    - Stage 5: storage.save_verified()
+    - Stage 6: tracker.record() — CVE mention tracking
+    - Stage 7: notifier.dispatch() — for novel items only
+    - _estimate_severity() — CVSS from NVD if available, else signal score heuristic
+
+  ingestion/reddit.py
+    - Normalized item builder (_build_item)
+    - JSON fetch + RSS fallback
+    - All items go through pipeline.processor.process()
+
+  ingestion/github.py
+    - _search_repos(), _search_issues(), _search_commits()
+    - _collect_org_issues() for vuln-research orgs
+    - Token bucket rate limiter
+    - Handles 403 rate limit with X-RateLimit-Reset sleep
+
+  ingestion/blog.py
+    - SHA1-based item ID (feed_url + entry_id)
+    - Extracts full content or summary
+    - 18 feeds
+
+  ingestion/nvd.py  [NEW]
+    - Polls NVD REST API for CVEs published in last NVD_LOOKBACK_DAYS
+    - Converts CVE records to normalized item format
+    - Forces through pipeline (NVD items always have CVE IDs = CVE bonus)
+
+  scheduler/runner.py
+    - 4 workers: reddit, github, blog, nvd
+    - Each wrapped with error logging
+    - SIGINT/SIGTERM graceful shutdown
+
+  api/server.py
+    - 11 endpoints (added /api/trending, /api/trending/<cve_id>,
+                    /api/audit, /api/audit/stats)
+    - 60s TTL cache
+    - Pagination on all list endpoints
+    - Input validation on search (3-200 chars)
+    - Platform validation on /api/feed/<platform>
+
+  main.py
+    - _bootstrap(): loads tracker from disk, registers notifier callback
+    - Modes: full / --ingest-only / --api-only / --collector X / --once
+    - API runs in daemon thread alongside ingestion workers
+
+  evvp-frontend/README.md
+    - Documents planned React frontend
+    - Lists all API endpoints it will consume
+
+--------------------------------------------------------------------------------
+  SESSION 4 — AUDIT SYSTEM + NOTIFICATIONS
+--------------------------------------------------------------------------------
+
+FILE: utils/audit.py  [NEW]
+  - Writes every system action to logs/audit.jsonl (machine-readable)
+  - Also writes to logs/audit.log (human-readable rotating, 10MB/5 backups)
+  - In-memory counters: items_collected, items_passed, items_dropped,
+                        notifications, trending_alerts, errors
+  - get_stats() — exposed via /api/audit/stats
+  - get_recent(n) — exposed via /api/audit?n=100
+  - Event name constants (EV_*) for typo-safe usage across codebase
+  - Thread-safe JSONL writes (_lock)
+
+WIRED INTO:
+  pipeline/processor.py
+    - audit(item_collected) on every item received
+    - audit(item_dropped) with reason + score when signal filter rejects
+    - audit(item_passed) with score + category + top matched signals
+    - audit(nvd_enriched) with cve_ids + count
+    - audit(item_duplicate) with reason + duplicate_of ID
+    - audit(item_novel) with cve_id + score + severity
+    - audit(storage_saved) with item_id
+    - audit(notification_sent) with cve_id + severity
+
+  pipeline/notifier.py
+    - audit(trending_detected) in dispatch_trending()
+    - audit(notification_sent) after successful webhook/email
+    - audit(notification_fail) on webhook/email exception
+
+  scheduler/runner.py
+    - audit(system_start) with worker list
+    - audit(system_stop) with reason on SIGINT/SIGTERM
+    - audit(worker_start) when each thread starts
+    - audit(worker_error) if a worker crashes
+
+FILE: api/server.py
+  ADDED: GET /api/audit?n=100       — last N audit entries from JSONL
+  ADDED: GET /api/audit/stats       — aggregate counters
+
+FILE: config/settings.py
+  ADDED: WEBHOOK_URL, ALERT_EMAIL_TO, ALERT_EMAIL_FROM
+  ADDED: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS
+  ADDED: NOTIFY_MIN_SCORE (default 14), NOTIFY_SEVERITY_FILTER (CRITICAL,HIGH)
+  ADDED: SPIKE_WINDOW_HOURS (6), SPIKE_THRESHOLD (3), TREND_COOLDOWN_MINS (60)
+
+FILE: .env.example
+  UPDATED: Added all notification + trending config with comments
+
+FILE: PROJECT_FLOW.txt  [NEW]
+  - Full project description
+  - Complete repo structure with file-by-file explanation
+  - Step-by-step data flow (9 steps)
+  - Audit log format with real examples
+  - How to run (all modes)
+  - Phase 1 checklist (all complete)
+  - Phase 2: Frontend (React + TypeScript + Tailwind)
+  - Phase 3: Verification Engine
+  - Phase 4: Additional Sources (Twitter, Telegram, CISA KEV, etc.)
+  - Phase 5: Production Hardening (Docker, Redis, Celery, k8s)
+  - Full .env configuration reference
+
+--------------------------------------------------------------------------------
+  CURRENT STATE — WHAT IS COMPLETE
+--------------------------------------------------------------------------------
+
+  [x] evvp-backend/ — fully structured, all files written
+  [x] 4 ingestion sources: Reddit, GitHub (repos+issues+commits+orgs), Blog (18 feeds), NVD
+  [x] 7-stage pipeline: score → enrich → novelty → store → track → notify → audit
+  [x] Thread-safe storage: PostgreSQL pool + JSONL with per-file locks + dedup
+  [x] CVE trend tracker: mention counting, spike detection, disk persistence
+  [x] Notification system: console + Slack/Discord webhook + SMTP email
+  [x] Structured audit trail: JSONL + rotating human log + in-memory counters
+  [x] REST API: 11 endpoints, TTL cache, pagination, input validation
+  [x] Graceful shutdown, retry decorator, rate limiter
+  [x] PROJECT_FLOW.txt: full architecture + phase roadmap
+  [x] AGENT_AUDIT.txt: this file — full work log
+  [x] evvp-frontend/ placeholder with API contract documented
+
+--------------------------------------------------------------------------------
+  WHAT IS NOT YET DONE (next steps)
+--------------------------------------------------------------------------------
+
+  [ ] Run python3 -m py_compile on all files to verify syntax (was cancelled)
+  [ ] Phase 2: React frontend (evvp-frontend/)
+  [ ] Phase 3: Verification engine (PoC validator, credibility scorer)
+  [ ] Phase 4: More sources (Twitter, CISA KEV, Exploit-DB, HackerOne)
+  [ ] Phase 5: Docker, Redis, Celery, tests, CI/CD
+
+--------------------------------------------------------------------------------
+  HOW TO START THE SYSTEM RIGHT NOW
+--------------------------------------------------------------------------------
+
+  cd evvp-backend
+  pip install -r requirements.txt
+  cp .env.example .env
+  # Add GITHUB_TOKEN to .env (minimum required for GitHub ingestion)
+  # Add WEBHOOK_URL to .env for Slack/Discord alerts (optional)
+
+  python main.py                    # full mode: all collectors + API on :8000
+
+  # In another terminal — watch the audit log live:
+  tail -f logs/audit.log
+
+  # Check what's trending:
+  curl http://localhost:8000/api/trending
+
+  # Check audit counters:
+  curl http://localhost:8000/api/audit/stats
+
+  # See last 50 audit events:
+  curl http://localhost:8000/api/audit?n=50
+
+================================================================================
+  END OF AGENT AUDIT LOG
+================================================================================

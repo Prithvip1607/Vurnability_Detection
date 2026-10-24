@@ -142,6 +142,8 @@ export function VulnCard({ item }: { item: IntelItem }) {
           <PlatformBadge platform={item.platform} />
           <SeverityBadge severity={severity} />
           {cves.length > 0 && <span className="badge badge-info">CVE</span>}
+          {(item.risk_score ?? item.intelligence?.risk_score ?? 0) >= 70 && <span className="badge badge-critical">RISK {item.risk_score ?? item.intelligence?.risk_score}</span>}
+          {(item.zero_day_score ?? item.intelligence?.zero_day_score ?? 0) >= 45 && cves.length === 0 && <span className="badge badge-zeroday">0-DAY {item.zero_day_score ?? item.intelligence?.zero_day_score}%</span>}
           {isNew(item.collected_at) && <span className="badge badge-new">NEW</span>}
           {item.sources && item.sources.length > 1 && (
             <span className="badge badge-info" style={{ background: 'rgba(6,182,212,0.1)', color: 'var(--cyan)', borderColor: 'rgba(6,182,212,0.25)' }}>

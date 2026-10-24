@@ -7,31 +7,34 @@ from datetime import datetime, timezone
 
 import requests
 
+from config.settings import TICK_SECONDS
 from config.settings import (
     GITHUB_TOKEN, GITHUB_KEYWORDS, GITHUB_VULN_ORGS,
     GITHUB_REQUESTS_PER_HOUR, GITHUB_POLL_INTERVAL,
 )
 from pipeline.processor import process
+from source_manager import manager
+from utils.audit import audit, EV_SOURCE_FETCH_FAIL
 from utils.logger import get_logger
 from utils.rate_limiter import RateLimiter
 from utils.retry import retry
 
 logger  = get_logger("ingestion.github")
 _lim    = RateLimiter(GITHUB_REQUESTS_PER_HOUR)
-_BASE   = "https://api.github.com"
+from config.settings import GITHUB_API_URL as _BASE
 _HDRS   = {
     "Accept": "application/vnd.github+json",
     **( {"Authorization": f"Bearer {GITHUB_TOKEN}"} if GITHUB_TOKEN else {} ),
 }
 
 
-@retry(max_attempts=3, base_delay=15.0, exceptions=(requests.RequestException,))
+@retry(max_attempts=2, base_delay=5.0, exceptions=(requests.RequestException,))
 def _get(url: str, params: dict | None = None) -> dict | list:
     _lim.wait()
     r = requests.get(url, headers=_HDRS, params=params, timeout=20)
     if r.status_code == 403:
         reset = int(r.headers.get("X-RateLimit-Reset", time.time() + 60))
-        wait  = max(reset - time.time(), 5)
+        wait  = min(max(reset - time.time(), 5), 120)      # never block a worker for more than 2 minutes
         logger.warning("GitHub rate limit — sleeping %.0fs", wait)
         time.sleep(wait)
         r = requests.get(url, headers=_HDRS, params=params, timeout=20)
@@ -40,7 +43,7 @@ def _get(url: str, params: dict | None = None) -> dict | list:
 
 
 def _ts(val: str | None) -> str:
-    return val or datetime.now(timezone.utc).isoformat()
+    return val or ""            # never invent an observation time; first-seen falls back to collection time
 
 
 def _search_repos(keyword: str) -> tuple[int, int]:
@@ -58,7 +61,7 @@ def _search_repos(keyword: str) -> tuple[int, int]:
             "title":    repo["full_name"],
             "text":     repo.get("description") or "",
             "author":   repo["owner"]["login"],
-            "timestamp": _ts(repo.get("updated_at")),
+            "timestamp": _ts(repo.get("created_at") or repo.get("updated_at")),
             "url":      repo["html_url"],
             "metadata": {
                 "keyword": keyword, "stars": repo.get("stargazers_count"),
@@ -87,7 +90,7 @@ def _search_issues(keyword: str) -> tuple[int, int]:
             "title":    issue["title"],
             "text":     issue.get("body") or "",
             "author":   issue["user"]["login"],
-            "timestamp": _ts(issue.get("updated_at")),
+            "timestamp": _ts(issue.get("created_at") or issue.get("updated_at")),
             "url":      issue["html_url"],
             "metadata": {
                 "keyword": keyword, "state": issue.get("state"),
@@ -145,7 +148,7 @@ def _collect_org_issues(org: str) -> tuple[int, int]:
             "title":    issue["title"],
             "text":     issue.get("body") or "",
             "author":   issue["user"]["login"],
-            "timestamp": _ts(issue.get("updated_at")),
+            "timestamp": _ts(issue.get("created_at") or issue.get("updated_at")),
             "url":      issue["html_url"],
             "metadata": {
                 "org": org, "state": issue.get("state"),
@@ -159,25 +162,49 @@ def _collect_org_issues(org: str) -> tuple[int, int]:
     return fetched, saved
 
 
-def run_once() -> None:
+def run_once(force: bool = False) -> None:
+    if not manager.gate("builtin-github", force):
+        return
+    if not GITHUB_TOKEN:
+        logger.warning("GITHUB_TOKEN is not set: GitHub search is limited to ~10 requests/minute. Set it in .env.")
+    ok = failed = streak = 0
+    last_error = ""
     for kw in GITHUB_KEYWORDS:
         for fn in (_search_repos, _search_issues, _search_commits):
+            if streak >= 3:                                  # circuit breaker: GitHub is down/blocked — stop this cycle
+                break
             try:
                 fn(kw)
+                ok += 1
+                streak = 0
             except Exception as e:
+                failed += 1
+                streak += 1
+                last_error = str(e)
                 logger.error("%s('%s') failed: %s", fn.__name__, kw, e)
-    for org in GITHUB_VULN_ORGS:
+        if streak >= 3:
+            logger.error("GitHub: 3 consecutive failures — aborting this cycle")
+            break
+    for org in GITHUB_VULN_ORGS if streak < 3 else []:
         try:
             _collect_org_issues(org)
+            ok += 1
         except Exception as e:
+            failed += 1
+            last_error = str(e)
             logger.error("org issues '%s' failed: %s", org, e)
+    if ok == 0 and failed:
+        manager.mark_fetch("builtin-github", success=False, error=f"all GitHub queries failed: {last_error}")
+        audit(EV_SOURCE_FETCH_FAIL, source="GitHub", source_id="builtin-github", error=last_error[:300])
+    else:
+        manager.mark_fetch("builtin-github", success=True, item_count=ok)
 
 
 def run_continuous() -> None:
-    logger.info("GitHub ingestion started (interval=%ds)", GITHUB_POLL_INTERVAL)
+    logger.info("GitHub collector started (interval comes from the Source Manager)")
     while True:
         try:
             run_once()
         except Exception as e:
             logger.error("GitHub cycle error: %s", e)
-        time.sleep(GITHUB_POLL_INTERVAL)
+        time.sleep(TICK_SECONDS)

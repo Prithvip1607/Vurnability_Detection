@@ -21,7 +21,7 @@ export default function ZeroDays() {
     <div className="page">
       <div className="page-header">
         <h1 className="page-title">🎯 Zero-Day Candidates</h1>
-        <p className="page-sub">High-signal items with <strong style={{ color: 'var(--red)' }}>NO CVE ID</strong> — pre-disclosure, unverified. These are the ones to watch.</p>
+        <p className="page-sub">Evidence-backed candidates with <strong style={{ color: 'var(--red)' }}>NO CVE ID</strong>. Confidence is calculated from exploitation language, PoC evidence, corroboration and source reputation.</p>
       </div>
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>

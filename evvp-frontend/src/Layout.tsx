@@ -6,6 +6,7 @@ const NAV = [
   { section: 'OVERVIEW' },
   { to: '/',            icon: '⚡', label: 'Dashboard'      },
   { to: '/audit',       icon: '📋', label: 'System Audit'   },
+  { to: '/landscape',   icon: '🌐', label: 'Threat Landscape' },
   { section: 'INTELLIGENCE' },
   { to: '/vulns',       icon: '🔎', label: 'All Findings'   },
   { to: '/zerodays',    icon: '🎯', label: 'Zero-Days'      },
@@ -13,12 +14,14 @@ const NAV = [
   { to: '/trending',    icon: '🔥', label: 'Trending'       },
   { to: '/verified',    icon: '🔬', label: 'Verified'       },
   { section: 'SOURCES' },
+  { to: '/sources',      icon: '⚙️', label: 'Source Manager' },
   { to: '/feed/reddit', icon: '🟠', label: 'Reddit'         },
   { to: '/feed/github', icon: '⚫', label: 'GitHub'         },
   { to: '/feed/blog',   icon: '🔵', label: 'Blogs / RSS'    },
   { to: '/feed/nvd',    icon: '🟣', label: 'NVD Feed'       },
   { section: 'TOOLS' },
   { to: '/search',      icon: '🔍', label: 'Search'         },
+  { to: '/analyst',     icon: '🤖', label: 'Analyst'        },
 ]
 
 export default function Layout() {

@@ -1,8 +1,5 @@
-praw>=7.7
-feedparser>=6.0
-requests>=2.31
-python-dotenv>=1.0
-flask>=3.0
-psycopg2-binary>=2.9
-flask-cors>=4.0
-openai>=1.0
+# Core — everything the supported dashboard + collectors need
+flask>=3.0,<4
+requests>=2.31,<3
+python-dotenv>=1.0,<2
+feedparser>=6.0,<7        # tolerant RSS/Atom parsing (a stdlib parser is used if it is missing)

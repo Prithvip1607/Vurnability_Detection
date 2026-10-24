@@ -1,0 +1,224 @@
+Frontend workflow (pages + buttons/controls)
+
+High-level app flow
+- App.tsx defines routes inside Layout:
+  - /              -> Dashboard
+  - /vulns         -> All Findings
+  - /zerodays      -> Zero-Days
+  - /cves          -> CVEs
+  - /trending      -> Trending
+  - /verified      -> Verified
+  - /feed/:platform-> Feed for a specific source (reddit/github/blog/nvd/all)
+  - /search        -> Search
+  - /audit         -> System Audit
+- Layout.tsx:
+  - Left sidebar navigation drives the routes.
+  - Polls backend health via GET /api/health and shows “Backend Online/Offline” with a colored dot.
+
+Shared components/cards
+- VulnCard (evvp-frontend/src/components.tsx)
+  - Title link and “View Source ↗” both open item.url in a new tab.
+  - Shows score badge, platform badge, severity badge.
+  - Shows CVE tags (item.cve_ids) and matched signal tags.
+  - Shows published/collected dates and source/author.
+  - If NVD enrichment exists (item.nvd_data[0].cvss_v3), shows CVSS score + vector + severity.
+- Pagination
+  - Prev/Next buttons; disabled at boundaries.
+- Spinner/Empty
+  - Loading indicator and “no results” messages.
+
+API layer (evvp-frontend/src/api.ts)
+- getStats() -> GET /api/stats
+- getTrending(hours, top) -> GET /api/trending?hours=&top=
+- getFeed(platform,page,per_page,days) -> GET /api/feed/:platform?page=&per_page=&days=
+- getZerodays(page,days,min_score) -> GET /api/zerodays?page=&days=&min_score=
+- getCves(page,days,min_score) -> GET /api/cves?page=&days=&min_score=
+- search(q,page,days) -> GET /api/search?q=&page=&days=
+- getAuditStats() -> GET /api/audit/stats
+- getVerified(page,days,status) -> GET /api/verified?page=&days=&status=
+
+Sidebar navigation (Layout.tsx)
+- Dashboard (⚡) -> /
+- System Audit (📋) -> /audit
+- All Findings (🔎) -> /vulns
+- Zero-Days (🫠) -> /zerodays
+- CVEs (🧡) -> /cves
+- Trending (🔥) -> /trending
+- Verified (🔬) -> /verified
+- Sources feed:
+  - Reddit -> /feed/reddit
+  - GitHub -> /feed/github
+  - Blogs/RSS -> /feed/blog
+  - NVD -> /feed/nvd
+- Search (🔍) -> /search
+
+Pages
+
+1) Dashboard (/)
+File: src/pages/Dashboard.tsx
+Fetch & refresh
+- Every 60s: getStats(), getAuditStats(), getTrending(24,10)
+Sections
+A. Top stat cards (clickable where “to” is set)
+- Total Stored -> /vulns
+- Last 24h -> /vulns
+- Reddit -> /feed/reddit
+- GitHub -> /feed/github
+- Blogs -> /feed/blog
+- NVD -> /feed/nvd
+B. Ingestion Pipeline – Live Counters
+- Shows counters: Collected, Passed Filter, Dropped (noise), Notifications, Trending Alerts, Errors.
+- Link: “View full audit →” -> /audit
+C. Collection Timeline (7 days)
+- Bar chart; no buttons.
+D. Trending CVEs (24h)
+- Time-fixed list (top items shown).
+- “Latest ↗” opens the latest.url in a new tab if present.
+- Link: “See all →” -> /trending
+E. Active Sources
+- Static info cards; no buttons.
+
+2) All Findings (/vulns)
+File: src/pages/Vulns.tsx
+Purpose
+- Analyst view of all collected findings from selected platform.
+Fetch & refresh
+- Fetches on changes to platform/days/page.
+Controls
+A. Platform tabs (buttons)
+- all, reddit, github, blog, nvd
+- On click: sets platform and resets page to 1.
+B. Days range tabs (buttons)
+- 1d, 3d, 7d, 14d, 30d
+- On click: sets days and resets page to 1.
+C. Sort dropdown
+- “Signal Score” or “Date”
+- Sorting is client-side on the currently fetched page.
+D. Quick filter input
+- Filter by title / CVE...
+- Client-side filtering against: title, text, and cve_ids.
+Pagination
+- Prev/Next via Pagination component.
+What happens to result cards
+- Each VulnCard has:
+  - Title link -> item.url
+  - View Source ↗ -> item.url
+
+3) Zero-Days (/zerodays)
+File: src/pages/ZeroDays.tsx
+Purpose
+- High-signal items with NO CVE ID (unverified pre-disclosure candidates).
+Fetch
+- getZerodays(page, days, minScore)
+Controls
+A. Days buttons
+- 3d, 7d, 14d, 30d
+- Clicking sets days and resets page to 1.
+B. Min score buttons
+- >=8, >=12, >=16, >=20
+- Clicking sets minScore and resets page to 1.
+Pagination
+- Prev/Next via Pagination.
+Cards
+- VulnCard title link + View Source ↗ (opens item.url).
+
+4) CVEs (/cves)
+File: src/pages/CVEs.tsx
+Purpose
+- Items with CVE IDs actively discussed.
+Fetch
+- getCves(page, days, minScore)
+Controls
+A. Days buttons: 3d, 7d, 14d, 30d
+B. Min score buttons: >=6, >=10, >=14
+- Each click resets page to 1.
+Pagination
+- Prev/Next via Pagination.
+Cards
+- VulnCard title link + View Source ↗.
+
+5) Trending (/trending)
+File: src/pages/Trending.tsx
+Purpose
+- CVEs ranked by mention count across all sources.
+Fetch & refresh
+- Fetches getTrending(hours,50) and refreshes every 60s.
+Controls
+- Time window buttons: 6h, 12h, 24h, 48h, 7d(168h)
+- Clicking sets the time window (hours).
+Rows
+- Each row shows rank, CVE id, mention count, source badges.
+- If available, “Latest ↗” opens latest.url.
+No pagination.
+
+6) Verified (/verified)
+File: src/pages/Verified.tsx
+Purpose
+- Phase 3 verification results (PoC detection, affected product extraction, credibility scoring).
+Fetch
+- getVerified(page, days, status)
+Controls
+A. Status summary cards (clickable)
+- CONFIRMED, LIKELY, UNVERIFIED, NOISE
+- Clicking toggles filter:
+  - if already selected -> clears status filter
+  - else sets status filter
+- Always resets page to 1.
+B. Days range buttons
+- 3d, 7d, 14d, 30d
+- Clicking sets days and resets page to 1.
+C. Status filter buttons
+- All + the four statuses
+- Clicking sets status filter and resets page to 1.
+Pagination
+- Prev/Next via Pagination.
+Cards
+- VerifCard is informational (no per-item buttons).
+
+7) Feed by source (/feed/:platform)
+File: src/pages/Feed.tsx
+Purpose
+- Source-specific feed (reddit/github/blog/nvd/all).
+Fetch
+- getFeed(platform, page, 50, days)
+Controls
+A. Days buttons: 3d, 7d, 14d, 30d
+- Updates days; page is reset to 1.
+Pagination
+- Prev/Next via Pagination.
+Cards
+- VulnCard title link + View Source ↗.
+
+8) Search (/search)
+File: src/pages/Search.tsx
+Purpose
+- Full-text search over collected intelligence.
+Controls
+A. Search input
+- Placeholder: Search CVE ID, product, exploit type...
+- Enter key runs search.
+- Search is only executed when q.trim().length >= 3.
+B. Days range buttons
+- 7d, 14d, 30d, 90d
+C. Search button
+- Click triggers search (sets page=1 first).
+D. Pagination
+- Changing page re-runs search with the same query and days.
+Cards
+- VulnCard title link + View Source ↗.
+
+9) System Audit (/audit)
+File: src/pages/AuditLog.tsx
+Purpose
+- Live pipeline counters and audit trail guidance.
+Fetch & refresh
+- getAuditStats() every 10s.
+Controls
+- No interactive buttons.
+Content
+- Counter grid: Items Collected, Passed Filter, Dropped, Notifications, Trending Alerts, Errors.
+- Efficiency section: pass rate %, noise drop rate %, visual bar.
+- Audit trail section includes where logs are stored and example commands/API endpoints.
+
+End of file.
+

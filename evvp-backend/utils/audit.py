@@ -28,7 +28,7 @@ import logging
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 _BASE    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_LOG_DIR = os.path.join(_BASE, "logs")
+_LOG_DIR = os.getenv("EVVP_LOG_DIR") or os.path.join(_BASE, "logs")
 os.makedirs(_LOG_DIR, exist_ok=True)
 
 _JSONL_PATH = os.path.join(_LOG_DIR, "audit.jsonl")
@@ -39,12 +39,13 @@ _logger = logging.getLogger("audit")
 if not _logger.handlers:
     _logger.setLevel(logging.INFO)
     _fmt = logging.Formatter("%(asctime)s [AUDIT] %(message)s")
-    fh = RotatingFileHandler(_LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=5)
-    fh.setFormatter(_fmt)
-    ch = logging.StreamHandler()
-    ch.setFormatter(_fmt)
-    _logger.addHandler(fh)
-    _logger.addHandler(ch)
+    try:
+        fh = RotatingFileHandler(_LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=5)
+        fh.setFormatter(_fmt)
+        _logger.addHandler(fh)
+    except OSError:
+        pass
+    _logger.propagate = False        # human-readable lines go to the audit.log file only; the console stays quiet
 
 # ── JSONL write lock ──────────────────────────────────────────────────────────
 _lock = threading.Lock()
@@ -98,8 +99,8 @@ def get_stats() -> dict:
         return dict(_stats)
 
 
-def get_recent(n: int = 100) -> list[dict]:
-    """Return the last N audit entries from the JSONL file."""
+def get_recent(n: int = 100, event: str | None = None, q: str | None = None) -> list[dict]:
+    """Return the last N audit entries (optionally filtered by event name / free text)."""
     entries = []
     if not os.path.exists(_JSONL_PATH):
         return entries
@@ -114,6 +115,11 @@ def get_recent(n: int = 100) -> list[dict]:
                         pass
     except OSError:
         pass
+    if event:
+        entries = [e for e in entries if e.get("event") == event]
+    if q:
+        ql = q.lower()
+        entries = [e for e in entries if ql in json.dumps(e, default=str).lower()]
     return entries[-n:]
 
 
@@ -131,14 +137,14 @@ def _update_stats(event: str) -> None:
             _stats["notifications"] += 1
         elif event == "trending_detected":
             _stats["trending_alerts"] += 1
-        elif event == "error":
+        elif event in ("error", "worker_error", "source_fetch_fail", "nvd_fetch_fail"):
             _stats["errors"] += 1
 
 
 def _log_human(event: str, entry: dict) -> None:
     """Format a readable one-liner for the rotating log."""
     parts = [f"event={event}"]
-    for key in ("platform", "cve_id", "title", "score", "severity",
+    for key in ("platform", "actor", "source", "cve_id", "title", "score", "severity", "status",
                 "reason", "channel", "mentions", "sources", "module", "message"):
         val = entry.get(key)
         if val is not None:
@@ -167,3 +173,20 @@ EV_NOTIFICATION_FAIL  = "notification_fail"
 EV_STORAGE_SAVED      = "storage_saved"
 EV_STORAGE_FAIL       = "storage_fail"
 EV_ERROR              = "error"
+
+# Source Manager
+EV_SOURCE_ADDED       = "source_added"
+EV_SOURCE_EDITED      = "source_edited"
+EV_SOURCE_ENABLED     = "source_enabled"
+EV_SOURCE_DISABLED    = "source_disabled"
+EV_SOURCE_DELETED     = "source_deleted"
+EV_SOURCE_TESTED      = "source_tested"
+EV_SOURCE_FETCH_FAIL  = "source_fetch_fail"
+EV_SOURCE_COLLECT_TRIGGERED = "source_collect_triggered"   # analyst pressed "Collect now"
+EV_SOURCE_COLLECTED   = "source_collected"                 # a collection finished (manual or scheduled)
+# Analyst workflow
+EV_FINDING_REVIEWED   = "finding_reviewed"
+EV_FINDING_CONFIRMED  = "finding_confirmed"
+EV_FINDING_FALSE_POS  = "finding_false_positive"
+EV_FINDING_RESOLVED   = "finding_resolved"
+EV_ANALYST_NOTE       = "analyst_note_added"

@@ -3,16 +3,24 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def _secret(name: str) -> str:
+    """Credential from the environment; a value that is only a stray '# comment' counts as unset."""
+    v = (os.getenv(name) or "").strip()
+    return "" if v.startswith("#") else v
+
 # ── Credentials ───────────────────────────────────────────────────────────────
 REDDIT_CLIENT_ID     = os.getenv("REDDIT_CLIENT_ID", "")
 REDDIT_CLIENT_SECRET = os.getenv("REDDIT_CLIENT_SECRET", "")
 REDDIT_USER_AGENT    = os.getenv("REDDIT_USER_AGENT", "EVVP/1.0")
-GITHUB_TOKEN         = os.getenv("GITHUB_TOKEN", "")
+GITHUB_TOKEN         = _secret("GITHUB_TOKEN")
 
 # ── Storage ───────────────────────────────────────────────────────────────────
 DB_URL       = os.getenv("DB_URL", "")   # PostgreSQL DSN; empty = JSON fallback
 BASE_DIR     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RAW_DATA_DIR = os.path.join(BASE_DIR, "raw_data")
+RAW_DATA_DIR = os.getenv("EVVP_RAW_DATA_DIR") or os.path.join(BASE_DIR, "raw_data")
+DATA_DIR     = os.getenv("EVVP_DATA_DIR") or os.path.join(BASE_DIR, "data")
+LOG_DIR      = os.getenv("EVVP_LOG_DIR") or os.path.join(BASE_DIR, "logs")
 
 # ── Polling intervals (seconds) ───────────────────────────────────────────────
 REDDIT_POLL_INTERVAL = int(os.getenv("REDDIT_POLL_INTERVAL", 300))
@@ -21,7 +29,7 @@ BLOG_POLL_INTERVAL   = int(os.getenv("BLOG_POLL_INTERVAL",   900))
 NVD_POLL_INTERVAL    = int(os.getenv("NVD_POLL_INTERVAL",   3600))
 
 # ── Rate limits ───────────────────────────────────────────────────────────────
-GITHUB_REQUESTS_PER_HOUR = 200   # conservative; authenticated = 5000/hr
+GITHUB_REQUESTS_PER_HOUR = int(os.getenv("GITHUB_REQUESTS_PER_HOUR", 1500 if _secret("GITHUB_TOKEN") else 120))   # search API: 30/min authed, 10/min anon
 
 # ── Pipeline thresholds ───────────────────────────────────────────────────────
 MIN_SIGNAL_SCORE      = 8    # drop items below this
@@ -75,8 +83,8 @@ RSS_FEEDS = [
 ]
 
 # ── NVD API ───────────────────────────────────────────────────────────────────
-NVD_API_KEY       = os.getenv("NVD_API_KEY", "")
-NVD_BASE_URL      = "https://services.nvd.nist.gov/rest/json/cves/2.0"
+NVD_API_KEY       = _secret("NVD_API_KEY")
+NVD_BASE_URL      = os.getenv("NVD_BASE_URL", "https://services.nvd.nist.gov/rest/json/cves/2.0")
 NVD_LOOKBACK_DAYS = 3   # fetch CVEs published in last N days
 
 # ── Notifications ─────────────────────────────────────────────────────────────
@@ -99,3 +107,31 @@ NOTIFY_SEVERITY_FILTER = set(os.getenv("NOTIFY_SEVERITY_FILTER", "CRITICAL,HIGH"
 SPIKE_WINDOW_HOURS  = int(os.getenv("SPIKE_WINDOW_HOURS", 6))    # window to detect spike
 SPIKE_THRESHOLD     = int(os.getenv("SPIKE_THRESHOLD", 3))       # mentions in window = trending
 TREND_COOLDOWN_MINS = int(os.getenv("TREND_COOLDOWN_MINS", 60))  # re-alert cooldown
+
+
+# ── Source trust (feeds the risk and zero-day scores) ────────────────────────
+TRUST_LEVELS = ("authoritative", "high", "medium", "low", "early_signal")
+TRUST_WEIGHT = {"authoritative": 100, "high": 80, "medium": 55, "early_signal": 40, "low": 30}
+SOURCE_TYPES = ("rss", "atom", "api", "custom")
+SOURCE_CATEGORIES = ("official", "vendor", "research", "news", "community")
+INTERVAL_MIN, INTERVAL_MAX = 5, 1440            # minutes
+
+# ── Dashboard / API ───────────────────────────────────────────────────────────
+HIGH_RISK_THRESHOLD = 60                        # risk >= this counts as "high-risk"
+ZERO_DAY_MIN_SCORE  = 45                        # confidence needed to be a candidate
+API_CACHE_TTL       = int(os.getenv("EVVP_CACHE_TTL", 30))
+API_TOKEN_ENV       = "EVVP_API_TOKEN"          # read at request time; empty = writes open
+CORS_ORIGINS = [o.strip() for o in os.getenv(
+    "EVVP_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if o.strip()]
+
+# ── Enrichment feeds ──────────────────────────────────────────────────────────
+KEV_URL = os.getenv("KEV_URL", "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json")
+EPSS_URL = os.getenv("EPSS_URL", "https://api.first.org/data/v1/epss")
+GITHUB_API_URL = os.getenv("GITHUB_API_URL", "https://api.github.com").rstrip("/")
+REDDIT_BASE_URL = os.getenv("REDDIT_BASE_URL", "https://www.reddit.com").rstrip("/")
+TICK_SECONDS = int(os.getenv("EVVP_TICK_SECONDS", 30))      # how often collectors check which sources are due
+KEV_TTL_HOURS = 6
+USER_AGENT = "EVVP/2.0 (vulnerability-intelligence platform)"
+# NVD public limit: 5 requests / rolling 30 s without an API key, 50 with one. Spacing requests keeps EVVP inside it.
+NVD_MIN_INTERVAL = float(os.getenv("NVD_MIN_INTERVAL_SECONDS", 0.7 if _secret("NVD_API_KEY") else 6.5))
+KEV_LOOKBACK_DAYS = int(os.getenv("EVVP_KEV_LOOKBACK_DAYS", 14))     # CISA KEV collector: ingest entries added within this many days
